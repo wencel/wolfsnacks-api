@@ -2,6 +2,7 @@ const express = require('express');
 const auth = require('../middlewares/auth');
 const utils = require('../utils');
 const Sale = require('../models/sale');
+const constants = require('../constants');
 
 const saleRouter = express.Router();
 
@@ -18,12 +19,6 @@ saleRouter.post('/', auth, async (req, res) => {
 // Get sales
 saleRouter.get('/', auth, async (req, res) => {
   try {
-    const match = {};
-    if (req.query.textQuery) {
-      match['$text'] = {
-        $search: req.query.textQuery,
-      };
-    }
     const sort = {};
     if (req.query.sortBy) {
       const parts = req.query.sortBy.split(':');
@@ -31,8 +26,18 @@ saleRouter.get('/', auth, async (req, res) => {
     }
     const limit = req.query.limit ? parseInt(req.query.limit) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip) : 0;
-    const sales = await Sale.find(match);
-    res.send(sales);
+    await req.user
+      .populate({
+        path: 'sales',
+        options: {
+          limit,
+          skip,
+          sort,
+        },
+      })
+      .execPopulate();
+    const total = await Sale.countDocuments({ user: req.user._id });
+    res.send({ data: req.user.sales, limit, skip, total });
   } catch (error) {
     res.status(500).send({ error: error.toString() });
   }
@@ -45,7 +50,7 @@ saleRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!sale) {
-      res.status(404).send({ error: 'Sale not found' });
+      res.status(404).send({ error: constants.errorMessages.SALE_NOT_FOUND });
     }
     res.send(sale);
   } catch (error) {
@@ -77,7 +82,7 @@ saleRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!sale) {
-      res.status(404).send({ error: 'Sale not found' });
+      res.status(404).send({ error: constants.errorMessages.SALE_NOT_FOUND });
     }
     updates.forEach(u => {
       sale[u] = req.body[u];
@@ -98,7 +103,7 @@ saleRouter.delete('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!sale) {
-      res.status(404).send({ error: 'Sale not found' });
+      res.status(404).send({ error: constants.errorMessages.SALE_NOT_FOUND });
       return;
     }
     await sale.remove();

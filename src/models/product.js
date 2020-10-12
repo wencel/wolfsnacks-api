@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { errorMessages } = require('../constants.js');
 const constants = require('../constants.js');
 
 const productSchema = mongoose.Schema(
@@ -7,6 +8,8 @@ const productSchema = mongoose.Schema(
       type: String,
       enum: constants.productTypes,
       required: true,
+      index: true,
+      text: true,
     },
     presentation: {
       type: String,
@@ -27,7 +30,7 @@ const productSchema = mongoose.Schema(
       required: true,
       validate(value) {
         if (value <= 0) {
-          throw new Error('El precio debe ser mayor a 0');
+          throw new Error(errorMessages.PRICE_INFERIOR_LIMIT);
         }
       },
     },
@@ -36,7 +39,7 @@ const productSchema = mongoose.Schema(
       required: true,
       validate(value) {
         if (value <= 0) {
-          throw new Error('El precio debe ser mayor a 0');
+          throw new Error(errorMessages.PRICE_INFERIOR_LIMIT);
         }
       },
     },
@@ -45,9 +48,10 @@ const productSchema = mongoose.Schema(
       required: true,
       validate(value) {
         if (value < 0) {
-          throw new Error('La cantidad debe ser mayor o igual a 0');
+          throw new Error(errorMessages.QUANTITY_INFERIOR_LIMIT_2);
         }
       },
+      default: 0,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -62,6 +66,15 @@ const productSchema = mongoose.Schema(
 
 productSchema.virtual('fullName').get(function () {
   return `${this.name} ${this.presentation} ${this.weight}`;
+});
+
+productSchema.post('save', function (error, doc, next) {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    throw new Error(errorMessages.PRODUCT_DUPLICATE_ERROR);
+    next();
+  } else {
+    next(error);
+  }
 });
 
 productSchema.index({ name: 1, presentation: 1, weight: 1 }, { unique: true });

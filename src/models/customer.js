@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const { errorMessages } = require('../constants.js');
 const constants = require('../constants.js');
 
 const customerSchema = mongoose.Schema(
@@ -7,16 +8,18 @@ const customerSchema = mongoose.Schema(
     name: {
       type: String,
       trim: true,
+      index: true,
     },
     email: {
       type: String,
       trim: true,
       lowercase: true,
       validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error('El correo electrónico no es válido');
+        if (value && !validator.isEmail(value)) {
+          throw new Error(errorMessages.IVALID_EMAIL);
         }
       },
+      index: true,
     },
     address: {
       type: String,
@@ -26,12 +29,13 @@ const customerSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      index: true,
     },
     phoneNumber: {
       type: String,
       validate(value) {
-        if (!validator.isNumeric(value)) {
-          throw new Error('El número de teléfono no es válido');
+        if (value && !validator.isNumeric(value)) {
+          throw new Error(errorMessages.INVALID_PHONE_NUMBER);
         }
       },
       trim: true,
@@ -40,10 +44,12 @@ const customerSchema = mongoose.Schema(
       type: String,
       enum: constants.localities,
       trim: true,
+      allowNull: true,
     },
     town: {
       type: String,
       trim: true,
+      index: true,
     },
     idNumber: {
       type: String,
@@ -59,6 +65,12 @@ const customerSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+customerSchema.index({
+  name: 'text',
+  email: 'text',
+  storeName: 'text',
+  town: 'text',
+});
 
 const Customer = mongoose.model('Customer', customerSchema);
 

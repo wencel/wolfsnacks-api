@@ -2,6 +2,7 @@ const express = require('express');
 const auth = require('../middlewares/auth');
 const utils = require('../utils');
 const Customer = require('../models/customer');
+const constants = require('../constants');
 
 const customerRouter = express.Router();
 
@@ -27,7 +28,7 @@ customerRouter.get('/', auth, async (req, res) => {
     const sort = {};
     if (req.query.sortBy) {
       const parts = req.query.sortBy.split(':');
-      sort[parts[0]] = parts[1] === 'desc' ? 1 : -1;
+      sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
     }
     const limit = req.query.limit ? parseInt(req.query.limit) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip) : 0;
@@ -42,7 +43,11 @@ customerRouter.get('/', auth, async (req, res) => {
         },
       })
       .execPopulate();
-    res.send(req.user.customers);
+    const total = await Customer.countDocuments({
+      user: req.user._id,
+      ...match,
+    });
+    res.send({ data: req.user.customers, limit, skip, total });
   } catch (error) {
     res.status(500).send({ error: error.toString() });
   }
@@ -55,7 +60,9 @@ customerRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!customer) {
-      res.status(404).send({ error: 'Customer not found' });
+      res
+        .status(404)
+        .send({ error: constants.errorMessages.CUSTOMER_NOT_FOUND });
     }
     res.send(customer);
   } catch (error) {
@@ -89,7 +96,9 @@ customerRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!customer) {
-      res.status(404).send({ error: 'Customer not found' });
+      res
+        .status(404)
+        .send({ error: constants.errorMessages.CUSTOMER_NOT_FOUND });
     }
     updates.forEach(u => {
       customer[u] = req.body[u];
@@ -110,7 +119,9 @@ customerRouter.delete('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!customer) {
-      res.status(404).send({ error: 'Customer not found' });
+      res
+        .status(404)
+        .send({ error: constants.errorMessages.CUSTOMER_NOT_FOUND });
       return;
     }
     res.send(customer);

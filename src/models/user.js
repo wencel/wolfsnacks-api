@@ -6,6 +6,7 @@ const Product = require('./product');
 const Customer = require('./customer');
 const Sale = require('./sale');
 const Order = require('./order');
+const { errorMessages } = require('../constants');
 const passwordValidator = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[\]:;<>,.?\/~_+\-=|]).{8,32}$/;
 
 const userSchema = mongoose.Schema(
@@ -23,7 +24,7 @@ const userSchema = mongoose.Schema(
       lowercase: true,
       validate(value) {
         if (!validator.isEmail(value)) {
-          throw new Error('Email is invalid');
+          throw new Error(errorMessages.INVALID_EMAIL);
         }
       },
     },
@@ -63,9 +64,7 @@ userSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {
     if (!passwordValidator.test(user.password)) {
-      throw new Error(
-        'Password must be 8 chars long, contain at least one uppercase, one lowercase and one special char'
-      );
+      throw new Error(errorMessages.INVALID_PASSWORD);
     }
     user.password = await bcrypt.hash(user.password, 8);
   }
@@ -138,11 +137,11 @@ userSchema.methods.generateAuthToken = async function (
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
   if (!user) {
-    throw new Error('Unable to login');
+    throw new Error(errorMessages.INVALID_EMAIL_PASWORD);
   }
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new Error('Unable to login');
+    throw new Error(errorMessages.INVALID_EMAIL_PASWORD);
   }
   return user;
 };

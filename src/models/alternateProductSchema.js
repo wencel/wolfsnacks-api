@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const { errorMessages } = require('../constants');
+// Schema to use in the order and sales schemas
 const alternateProductSchema = mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
@@ -10,7 +12,7 @@ const alternateProductSchema = mongoose.Schema({
     required: true,
     validate(value) {
       if (value <= 0) {
-        throw new Error('El valor debe ser mayor a 0');
+        throw new Error(errorMessages.PRICE_INFERIOR_LIMIT);
       }
     },
   },
@@ -19,7 +21,7 @@ const alternateProductSchema = mongoose.Schema({
     required: true,
     validate(value) {
       if (value <= 0) {
-        throw new Error('El valor debe ser mayor a 0');
+        throw new Error(errorMessages.QUANTITY_INFERIOR_LIMIT);
       }
     },
   },
@@ -28,7 +30,7 @@ const alternateProductSchema = mongoose.Schema({
     required: true,
     validate(value) {
       if (value <= 0) {
-        throw new Error('El valor debe ser mayor a 0');
+        throw new Error(errorMessages.TOTAL_PRICE_INFERIOR_LIMIT);
       }
     },
   },

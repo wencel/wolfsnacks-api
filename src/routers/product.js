@@ -2,18 +2,18 @@ const express = require('express');
 const auth = require('../middlewares/auth');
 const utils = require('../utils');
 const Product = require('../models/product');
+const constants = require('../constants');
 
 const productRouter = express.Router();
 
 // Create product
 productRouter.post('/', auth, async (req, res) => {
-  debugger;
   const product = new Product({ ...req.body, user: req.user._id });
   try {
     await product.save();
     res.status(201).send(product);
   } catch (error) {
-    res.status(400).send({ error });
+    res.status(400).send({ error: error.toString() });
   }
 });
 // Get products
@@ -46,7 +46,8 @@ productRouter.get('/', auth, async (req, res) => {
         },
       })
       .execPopulate();
-    res.send(req.user.products);
+    const total = await Product.countDocuments({ user: req.user._id });
+    res.send({ data: req.user.products, limit, skip, total });
   } catch (error) {
     res.status(500).send({ error: error.toString() });
   }
@@ -59,7 +60,9 @@ productRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!product) {
-      res.status(404).send({ error: 'Product not found' });
+      res
+        .status(404)
+        .send({ error: constants.errorMessages.PRODUCT_NOT_FOUND });
     }
     res.send(product);
   } catch (error) {
@@ -84,7 +87,9 @@ productRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!product) {
-      res.status(404).send({ error: 'Product not found' });
+      res
+        .status(404)
+        .send({ error: constants.errorMessages.PRODUCT_NOT_FOUND });
     }
     updates.forEach(u => {
       product[u] = req.body[u];
@@ -105,7 +110,9 @@ productRouter.delete('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!product) {
-      res.status(404).send({ error: 'Product not found' });
+      res
+        .status(404)
+        .send({ error: constants.errorMessages.PRODUCT_NOT_FOUND });
       return;
     }
     res.send(product);

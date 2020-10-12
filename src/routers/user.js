@@ -1,6 +1,6 @@
 const express = require('express');
 const User = require('../models/user');
-const checkValidUpdates = require('../utils');
+const { checkValidUpdates } = require('../utils');
 const auth = require('../middlewares/auth');
 const multer = require('multer');
 const sharp = require('sharp');
@@ -30,7 +30,7 @@ userRouter.get('/me', auth, async (req, res) => {
 // Update user
 userRouter.patch('/me', auth, async (req, res) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['name', 'email', 'password', 'email'];
+  const allowedUpdates = ['name', 'password'];
   const failedUpdates = checkValidUpdates(updates, allowedUpdates);
   if (failedUpdates.length > 0) {
     return res.status(400).send({
