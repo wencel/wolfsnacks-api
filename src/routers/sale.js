@@ -29,6 +29,9 @@ saleRouter.get('/', auth, async (req, res) => {
     await req.user
       .populate({
         path: 'sales',
+        populate: {
+          path: 'customer',
+        },
         options: {
           limit,
           skip,
@@ -48,6 +51,8 @@ saleRouter.get('/:id', auth, async (req, res) => {
     const sale = await Sale.findOne({
       _id: req.params.id,
       user: req.user._id,
+    }).populate({
+      path: 'customer',
     });
     if (!sale) {
       res.status(404).send({ error: constants.errorMessages.SALE_NOT_FOUND });

@@ -44,7 +44,7 @@ orderSchema.pre('save', async function (next) {
     /* if there are previous products then this is an existing order and the quantity
       to add will be the diference between the previous order amount and the new
       order amount, this takes negatives into account*/
-    if (this._previousProducts && this._previousProducts.lenght > 0) {
+    if (this._previousProducts && this._previousProducts.length > 0) {
       const newQuantity = this._previousProducts.find(
         p => p.product._id === product.product._id
       )?.quantity;
@@ -57,7 +57,7 @@ orderSchema.pre('save', async function (next) {
   }
   /* If there are previous products this block checks if a product was removed, and if so
   removes the quantity from the stock, the stock cannot be less than zero*/
-  if (this._previousProducts && this._previousProducts.lenght > 0) {
+  if (this._previousProducts && this._previousProducts.length > 0) {
     for (let i = 0, len = this._previousProducts.length; i < len; i++) {
       try {
         const prevProduct = this._previousProducts[i];
