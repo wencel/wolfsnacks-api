@@ -19,6 +19,16 @@ saleRouter.post('/', auth, async (req, res) => {
 // Get sales
 saleRouter.get('/', auth, async (req, res) => {
   try {
+    const match = {};
+    if (req.query.isThirteenDozen) {
+      match.isThirteenDozen = req.query.isThirteenDozen === 'true';
+    }
+    if (req.query.owes) {
+      match.owes = req.query.owes === 'true';
+    }
+    if (req.query.customer) {
+      match.customer = req.query.customer;
+    }
     const sort = {};
     if (req.query.sortBy) {
       const parts = req.query.sortBy.split(':');
@@ -32,6 +42,7 @@ saleRouter.get('/', auth, async (req, res) => {
         populate: {
           path: 'customer',
         },
+        match,
         options: {
           limit,
           skip,
