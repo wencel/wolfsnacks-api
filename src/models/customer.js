@@ -33,6 +33,7 @@ const customerSchema = mongoose.Schema(
     },
     phoneNumber: {
       type: String,
+      required: true,
       validate(value) {
         if (value && !validator.isNumeric(value)) {
           throw new Error(errorMessages.INVALID_PHONE_NUMBER);
@@ -71,6 +72,11 @@ customerSchema.index({
   storeName: 'text',
   town: 'text',
 });
+
+customerSchema.index(
+  { address: 1, storeName: 1, phoneNumber: 1 },
+  { unique: true }
+);
 
 const Customer = mongoose.model('Customer', customerSchema);
 

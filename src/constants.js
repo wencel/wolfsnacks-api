@@ -42,6 +42,7 @@ errorMessages = {
   ORDER_NOT_FOUND: 'Orden no existe',
   PRODUCT_NOT_FOUND: 'Producto no existe',
   SALE_NOT_FOUND: 'Venta no existe',
+  NOT_ENOUGH_PRODUCT: 'No hay suficientes unidades del producto',
   PLEASE_AUTHENTICATE: 'Please authenticate.',
   PRODUCT_DUPLICATE_ERROR:
     'Los campos Nombre, Presentación y Peso deben ser una combinacion única. Ya existe un producto como el que estas tratando de crear.',

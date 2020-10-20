@@ -71,7 +71,9 @@ saleSchema.pre('save', async function (next) {
         quantityToRemove = product.quantity - (newQuantity ? newQuantity : 0);
       }
       item.stock = item.stock - quantityToRemove;
-      item.stock = item.stock < 0 ? 0 : item.stock;
+      if (item.stock < 0) {
+        throw new Error(`${errorMessages.NOT_ENOUGH_PRODUCT} ${item.fullName}`);
+      }
       await item.save();
     } catch (e) {
       throw new Error(e);
