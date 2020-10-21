@@ -11,7 +11,12 @@ require('./db/mongoose');
 
 const app = express();
 
-const allowedOrigins = ['http://localhost:3001', 'http://192.168.1.138:3001'];
+const allowedOrigins = [
+  'http://localhost:3001',
+  'http://192.168.1.138:3001',
+  'http://wolfsnacks-app.herokuapp.com',
+  'https://wolfsnacks-app.herokuapp.com',
+];
 app.use(
   cors({
     origin: function (origin, callback) {
