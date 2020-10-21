@@ -74,7 +74,7 @@ customerSchema.index({
 });
 
 customerSchema.index(
-  { address: 1, storeName: 1, phoneNumber: 1 },
+  { address: 1, storeName: 1, phoneNumber: 1, user: 1 },
   { unique: true }
 );
 

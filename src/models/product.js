@@ -77,7 +77,10 @@ productSchema.post('save', function (error, doc, next) {
   }
 });
 
-productSchema.index({ name: 1, presentation: 1, weight: 1 }, { unique: true });
+productSchema.index(
+  { name: 1, presentation: 1, weight: 1, user: 1 },
+  { unique: true }
+);
 
 const Product = mongoose.model('Product', productSchema);
 

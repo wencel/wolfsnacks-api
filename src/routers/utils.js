@@ -23,7 +23,8 @@ utilsRouter.get('/productTypes', (req, res) => {
 
 utilsRouter.post('/uploadCustomers', auth, async (req, res) => {
   let number = 0;
-  for (let index = 0; index < req.body.values.length; index++) {
+  debugger;
+  for (let index = 0; index < req.body.values?.length; index++) {
     try {
       const customerToSend = { user: req.user._id };
       if (req.body.values[index][1]) {
