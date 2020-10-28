@@ -5,6 +5,10 @@ const { errorMessages } = require('../constants');
 
 const saleSchema = mongoose.Schema(
   {
+    saleDate: {
+      type: Date,
+      default: new Date(),
+    },
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
@@ -60,13 +64,17 @@ saleSchema.pre('save', async function (next) {
     try {
       const product = this.products[i];
       const item = await Product.findById(product.product);
+      if (!item) {
+        throw new Error('El producto no existe');
+      }
+      debugger;
       let quantityToRemove = product.quantity;
       /* if there are previous products then this is an existing sale and the quantity
       to substract will be the diference between the previous order amount and the new
       order amount, this takes negatives into account*/
       if (this._previousProducts && this._previousProducts.length > 0) {
         const newQuantity = this._previousProducts.find(
-          p => p.product._id === product.product._id
+          p => p.product.toString() === product.product.toString()
         )?.quantity;
         quantityToRemove = product.quantity - (newQuantity ? newQuantity : 0);
       }
@@ -75,6 +83,7 @@ saleSchema.pre('save', async function (next) {
         throw new Error(`${errorMessages.NOT_ENOUGH_PRODUCT} ${item.fullName}`);
       }
       await item.save();
+      next();
     } catch (e) {
       throw new Error(e);
     }

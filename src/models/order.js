@@ -5,6 +5,10 @@ const { errorMessages } = require('../constants');
 
 const orderSchema = mongoose.Schema(
   {
+    orderDate: {
+      type: Date,
+      default: new Date(),
+    },
     totalPrice: {
       type: Number,
       validate(value) {
@@ -35,25 +39,28 @@ orderSchema.pre('save', async function (next) {
   /* On presave the new item stock will be calculated, this is previous stock plus the 
   amount in the order*/
   for (let i = 0, len = this.products.length; i < len; i++) {
-    const product = this.products[i];
-    const item = await Product.findById(product.product);
-    if (!item) {
-      throw new Error('El producto no existe');
-    }
-    let quantityToAdd = product.quantity;
-    /* if there are previous products then this is an existing order and the quantity
+    try {
+      const product = this.products[i];
+      const item = await Product.findById(product.product);
+      if (!item) {
+        throw new Error('El producto no existe');
+      }
+      let quantityToAdd = product.quantity;
+      /* if there are previous products then this is an existing order and the quantity
       to add will be the diference between the previous order amount and the new
       order amount, this takes negatives into account*/
-    if (this._previousProducts && this._previousProducts.length > 0) {
-      const newQuantity = this._previousProducts.find(
-        p => p.product._id === product.product._id
-      )?.quantity;
-      quantityToAdd = product.quantity - (newQuantity ? newQuantity : 0);
+      if (this._previousProducts && this._previousProducts.length > 0) {
+        const newQuantity = this._previousProducts.find(
+          p => p.product.toString() === product.product.toString()
+        )?.quantity;
+        quantityToAdd = product.quantity - (newQuantity ? newQuantity : 0);
+      }
+      item.stock = item.stock + quantityToAdd;
+      await item.save();
+      next();
+    } catch (e) {
+      throw new Error(e);
     }
-    item.stock = item.stock + quantityToAdd;
-    item.stock = item.stock < 0 ? 0 : item.stock;
-    await item.save();
-    next();
   }
   /* If there are previous products this block checks if a product was removed, and if so
   removes the quantity from the stock, the stock cannot be less than zero*/
@@ -62,7 +69,9 @@ orderSchema.pre('save', async function (next) {
       try {
         const prevProduct = this._previousProducts[i];
         if (
-          !this.products.find(p => p.product._id === prevProduct.product._id)
+          !this.products.find(
+            p => p.product.toString() === prevProduct.product.toString()
+          )
         ) {
           const item = await Product.findById(prevProduct.product);
           item.stock = item.stock - prevProduct.quantity;
