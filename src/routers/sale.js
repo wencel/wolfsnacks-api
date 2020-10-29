@@ -85,6 +85,7 @@ saleRouter.patch('/:id', auth, async (req, res) => {
     'partialPayment',
     'totalPrice',
     'products',
+    'saleDate',
   ];
   const failedUpdates = utils.checkValidUpdates(updates, allowedUpdates);
   if (failedUpdates.length > 0) {

@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
+const autoIncrement = require('mongoose-auto-increment');
 const Product = require('./product');
 const alternateProductSchema = require('./alternateProductSchema');
 const { errorMessages } = require('../constants');
 
 const saleSchema = mongoose.Schema(
   {
+    saleId: {
+      type: Number,
+    },
     saleDate: {
       type: Date,
       default: new Date(),
@@ -126,6 +130,14 @@ saleSchema.pre('remove', async function (next) {
     }
   }
   next();
+});
+
+autoIncrement.initialize(mongoose.connection);
+
+saleSchema.plugin(autoIncrement.plugin, {
+  model: 'Sale',
+  field: 'saleId',
+  startAt: 1,
 });
 
 const Sale = mongoose.model('Sale', saleSchema);

@@ -74,7 +74,7 @@ orderRouter.get('/:id', auth, async (req, res) => {
 // Update order
 orderRouter.patch('/:id', auth, async (req, res) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['totalPrice', 'products'];
+  const allowedUpdates = ['totalPrice', 'products', 'orderDate'];
   const failedUpdates = utils.checkValidUpdates(updates, allowedUpdates);
   if (failedUpdates.length > 0) {
     return res.status(400).send({

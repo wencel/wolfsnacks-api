@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
+const autoIncrement = require('mongoose-auto-increment');
 const Product = require('./product');
 const alternateProductSchema = require('./alternateProductSchema');
 const { errorMessages } = require('../constants');
 
 const orderSchema = mongoose.Schema(
   {
+    orderId: {
+      type: Number,
+    },
     orderDate: {
       type: Date,
       default: new Date(),
@@ -102,6 +106,14 @@ orderSchema.pre('remove', async function (next) {
     }
   }
   next();
+});
+
+autoIncrement.initialize(mongoose.connection);
+
+orderSchema.plugin(autoIncrement.plugin, {
+  model: 'Order',
+  field: 'orderId',
+  startAt: 1,
 });
 
 const Order = mongoose.model('Order', orderSchema);
