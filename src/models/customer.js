@@ -41,6 +41,15 @@ const customerSchema = mongoose.Schema(
       },
       trim: true,
     },
+    secondaryPhoneNumber: {
+      type: String,
+      validate(value) {
+        if (value && !validator.isNumeric(value)) {
+          throw new Error(errorMessages.INVALID_PHONE_NUMBER);
+        }
+      },
+      trim: true,
+    },
     locality: {
       type: String,
       enum: constants.localities,

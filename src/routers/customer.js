@@ -80,6 +80,7 @@ customerRouter.patch('/:id', auth, async (req, res) => {
     'address',
     'storeName',
     'phoneNumber',
+    'secondaryPhoneNumber',
     'locality',
     'town',
     'idNumber',
