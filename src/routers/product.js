@@ -25,7 +25,7 @@ productRouter.get('/', auth, async (req, res) => {
     }
     if (req.query.textQuery) {
       const regex = new RegExp(`${req.query.textQuery}(h?)`, 'gmi');
-      match. = [
+      match['$or'] = [
         {
           name: { $regex: regex },
         },
