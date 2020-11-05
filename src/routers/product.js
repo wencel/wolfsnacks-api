@@ -24,9 +24,15 @@ productRouter.get('/', auth, async (req, res) => {
       match.presentation = req.query.presentation;
     }
     if (req.query.textQuery) {
-      match['$text'] = {
-        $search: req.query.textQuery,
-      };
+      const regex = new RegExp(`${req.query.textQuery}(h?)`, 'gmi');
+      match. = [
+        {
+          name: { $regex: regex },
+        },
+        {
+          presentation: { $regex: regex },
+        },
+      ];
     }
     const sort = {};
     if (req.query.sortBy) {

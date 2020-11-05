@@ -22,7 +22,7 @@ orderRouter.get('/', auth, async (req, res) => {
   try {
     const match = {};
     if (req.query.initDate && req.query.endDate) {
-      match.createdAt = {
+      match.orderDate = {
         $gte: new Date(req.query.initDate),
         $lte: new Date(req.query.endDate),
       };

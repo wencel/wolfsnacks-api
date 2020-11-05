@@ -21,9 +21,18 @@ customerRouter.get('/', auth, async (req, res) => {
   try {
     const match = {};
     if (req.query.textQuery) {
-      match['$text'] = {
-        $search: req.query.textQuery,
-      };
+      const regex = new RegExp(`${req.query.textQuery}(h?)`, 'gmi');
+      match['$or'] = [
+        {
+          name: { $regex: regex },
+        },
+        {
+          email: { $regex: regex },
+        },
+        {
+          storeName: { $regex: regex },
+        },
+      ];
     }
     const sort = {};
     if (req.query.sortBy) {

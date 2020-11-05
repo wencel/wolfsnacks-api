@@ -71,7 +71,6 @@ saleSchema.pre('save', async function (next) {
       if (!item) {
         throw new Error('El producto no existe');
       }
-      debugger;
       let quantityToRemove = product.quantity;
       /* if there are previous products then this is an existing sale and the quantity
       to substract will be the diference between the previous order amount and the new

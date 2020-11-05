@@ -29,6 +29,12 @@ saleRouter.get('/', auth, async (req, res) => {
     if (req.query.customer) {
       match.customer = req.query.customer;
     }
+    if (req.query.initDate && req.query.endDate) {
+      match.saleDate = {
+        $gte: new Date(req.query.initDate),
+        $lte: new Date(req.query.endDate),
+      };
+    }
     const sort = {};
     if (req.query.sortBy) {
       const parts = req.query.sortBy.split(':');
