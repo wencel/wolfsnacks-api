@@ -37,19 +37,8 @@ const userThree = {
   active: false,
 };
 
-const setupDB = async () => {
-  await new User(userOne).save();
-  await new User(userTwo).save();
-  await new User(userThree).save();
-};
-const clearDB = async () => {
-  await User.deleteMany();
-};
-
 module.exports = {
   userOne,
   userTwo,
   userThree,
-  setupDB,
-  clearDB,
 };

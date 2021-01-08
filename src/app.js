@@ -6,9 +6,9 @@ const customerRouter = require('./routers/customer');
 const orderRouter = require('./routers/order');
 const saleRouter = require('./routers/sale');
 const utilsRouter = require('./routers/utils');
+const dbhelper = require('./helpers/database');
 
-require('./db/mongoose');
-
+dbhelper.connect();
 const app = express();
 
 const allowedOrigins = [

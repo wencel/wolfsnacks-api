@@ -12,8 +12,10 @@
     "test": "env-cmd -f ./config/test.env jest --watch --runInBand"
   },
   "devDependencies": {
+    "dotenv": "^8.2.0",
     "env-cmd": "^10.1.0",
     "jest": "^26.0.1",
+    "mongodb-memory-server": "^6.9.2",
     "nodemon": "^2.0.4",
     "supertest": "^4.0.2"
   },
