@@ -34,11 +34,16 @@ productRouter.get('/', auth, async (req, res) => {
         },
       ];
     }
-    const sort = {};
-    if (req.query.sortBy) {
-      const parts = req.query.sortBy.split(':');
-      sort[parts[0]] = parts[1] === 'desc' ? 1 : -1;
-    }
+    const sort = {
+      name: 'asc',
+      presentation: 'asc',
+      weight: 'asc',
+    };
+
+    // if (req.query.sortBy) {
+    //   const parts = req.query.sortBy.split(':');
+    //   sort[parts[0]] = parts[1] === 'desc' ? 1 : -1;
+    // }
     const limit = req.query.limit ? parseInt(req.query.limit) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip) : 0;
     await req.user

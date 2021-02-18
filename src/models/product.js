@@ -82,6 +82,9 @@ productSchema.index(
   { unique: true }
 );
 
+productSchema.set('toObject', { virtuals: true });
+productSchema.set('toJSON', { virtuals: true });
+
 const Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;
