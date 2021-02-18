@@ -35,9 +35,9 @@ productRouter.get('/', auth, async (req, res) => {
       ];
     }
     const sort = {
+      weight: 'asc',
       name: 'asc',
       presentation: 'asc',
-      weight: 'asc',
     };
 
     // if (req.query.sortBy) {
