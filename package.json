@@ -15,7 +15,7 @@
     "env-cmd": "^10.1.0",
     "jest": "^26.0.1",
     "nodemon": "^2.0.4",
-    "supertest": "^4.0.2"
+    "supertest": "^7.0.0"
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.4",
