@@ -1,19 +1,18 @@
-const mongoose = require('mongoose');
-const { errorMessages } = require('../constants.js');
-const constants = require('../constants.js');
+import mongoose from 'mongoose';
+import { errorMessages, productTypes, presentations } from '../constants.js';
 
 const productSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      enum: constants.productTypes,
+      enum: productTypes,
       required: true,
       index: true,
       text: true,
     },
     presentation: {
       type: String,
-      enum: constants.presentations,
+      enum: presentations,
       required: true,
     },
     weight: {
@@ -87,4 +86,4 @@ productSchema.set('toJSON', { virtuals: true });
 
 const Product = mongoose.model('Product', productSchema);
 
-module.exports = Product;
+export default Product;

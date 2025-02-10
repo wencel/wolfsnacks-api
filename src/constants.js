@@ -1,4 +1,4 @@
-const localities = [
+export const localities = [
   '',
   'Usaquén',
   'Chapinero',
@@ -22,11 +22,17 @@ const localities = [
   'Sumapaz',
 ];
 
-const presentations = ['', 'Sobre', 'Caja Sello Plus', 'Recarga', 'Bombonera'];
+export const presentations = [
+  '',
+  'Sobre',
+  'Caja Sello Plus',
+  'Recarga',
+  'Bombonera',
+];
 
-const productTypes = ['', 'Maxigalleta', 'Minigalleta', 'Chips'];
+export const productTypes = ['', 'Maxigalleta', 'Minigalleta', 'Chips'];
 
-errorMessages = {
+export const errorMessages = {
   PRICE_INFERIOR_LIMIT: 'El valor del precio debe ser mayor a 0',
   PRICE_INFERIOR_LIMIT_2: 'El valor del precio debe ser mayor o igual a 0',
   QUANTITY_INFERIOR_LIMIT: 'La cantidad debe ser mayor a 0',
@@ -47,5 +53,3 @@ errorMessages = {
   PRODUCT_DUPLICATE_ERROR:
     'Los campos Nombre, Presentación y Peso deben ser una combinacion única. Ya existe un producto como el que estas tratando de crear.',
 };
-
-module.exports = { localities, presentations, productTypes, errorMessages };

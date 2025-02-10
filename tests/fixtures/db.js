@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const User = require('../../src/models/user');
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import User from '../../src/models/user';
 
 const userOneId = new mongoose.Types.ObjectId();
 const userOne = {
@@ -46,7 +46,7 @@ const clearDB = async () => {
   await User.deleteMany();
 };
 
-module.exports = {
+export default {
   userOne,
   userTwo,
   userThree,

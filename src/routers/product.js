@@ -1,8 +1,8 @@
-const express = require('express');
-const auth = require('../middlewares/auth');
-const utils = require('../utils');
-const Product = require('../models/product');
-const constants = require('../constants');
+import express from 'express';
+import auth from '../middlewares/auth.js';
+import { checkValidUpdates } from '../utils.js';
+import Product from '../models/product.js';
+import { errorMessages } from '../constants.js';
 
 const productRouter = express.Router();
 
@@ -46,17 +46,15 @@ productRouter.get('/', auth, async (req, res) => {
     // }
     const limit = req.query.limit ? parseInt(req.query.limit) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip) : 0;
-    await req.user
-      .populate({
-        path: 'products',
-        match,
-        options: {
-          limit,
-          skip,
-          sort,
-        },
-      })
-      .execPopulate();
+    await req.user.populate({
+      path: 'products',
+      match,
+      options: {
+        limit,
+        skip,
+        sort,
+      },
+    });
     const total = await Product.countDocuments({ user: req.user._id });
     res.send({ data: req.user.products, limit, skip, total });
   } catch (error) {
@@ -71,9 +69,7 @@ productRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!product) {
-      res
-        .status(404)
-        .send({ error: constants.errorMessages.PRODUCT_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.PRODUCT_NOT_FOUND });
     }
     res.send(product);
   } catch (error) {
@@ -86,7 +82,7 @@ productRouter.get('/:id', auth, async (req, res) => {
 productRouter.patch('/:id', auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ['basePrice', 'sellingPrice', 'stock'];
-  const failedUpdates = utils.checkValidUpdates(updates, allowedUpdates);
+  const failedUpdates = checkValidUpdates(updates, allowedUpdates);
   if (failedUpdates.length > 0) {
     return res.status(400).send({
       error: `Invalid fields to update ${failedUpdates.toString()}`,
@@ -98,9 +94,7 @@ productRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!product) {
-      res
-        .status(404)
-        .send({ error: constants.errorMessages.PRODUCT_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.PRODUCT_NOT_FOUND });
     }
     updates.forEach(u => {
       product[u] = req.body[u];
@@ -121,9 +115,7 @@ productRouter.delete('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!product) {
-      res
-        .status(404)
-        .send({ error: constants.errorMessages.PRODUCT_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.PRODUCT_NOT_FOUND });
       return;
     }
     res.send(product);
@@ -134,4 +126,4 @@ productRouter.delete('/:id', auth, async (req, res) => {
   }
 });
 
-module.exports = productRouter;
+export default productRouter;

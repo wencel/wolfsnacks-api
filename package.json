@@ -2,6 +2,7 @@
   "name": "wolf-snacks-api",
   "version": "1.0.0",
   "description": "API for the wolfsnacks app",
+  "type": "module",
   "main": "index.js",
   "author": "Wencel Santos",
   "license": "MIT",
@@ -18,14 +19,15 @@
     "supertest": "^7.0.0"
   },
   "dependencies": {
-    "@sendgrid/mail": "^8.1.4",
     "bcrypt": "^5.1.1",
     "chalk": "^5.4.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "mailtrap": "^3.4.0",
     "mongodb": "^6.13.0",
     "mongoose": "^8.9.6",
+    "mongoose-id-autoincrement": "^1.0.5",
     "multer": "^1.4.5-lts.1",
     "sharp": "^0.33.5",
     "validator": "^13.12.0"

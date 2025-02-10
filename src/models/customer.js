@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const { errorMessages } = require('../constants.js');
-const constants = require('../constants.js');
+import mongoose from 'mongoose';
+import validator from 'validator';
+import { errorMessages, localities } from '../constants.js';
 
 const customerSchema = mongoose.Schema(
   {
@@ -52,7 +51,7 @@ const customerSchema = mongoose.Schema(
     },
     locality: {
       type: String,
-      enum: constants.localities,
+      enum: localities,
       trim: true,
       allowNull: true,
     },
@@ -89,4 +88,4 @@ customerSchema.index(
 
 const Customer = mongoose.model('Customer', customerSchema);
 
-module.exports = Customer;
+export default Customer;

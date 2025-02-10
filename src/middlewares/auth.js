@@ -1,6 +1,7 @@
-const jwt = require('jsonwebtoken');
-const constants = require('../constants');
-const User = require('../models/user');
+import jwt from 'jsonwebtoken';
+import { errorMessages } from '../constants.js';
+import User from '../models/user.js';
+
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '');
@@ -17,10 +18,8 @@ const auth = async (req, res, next) => {
     req.token = token;
     next();
   } catch {
-    res
-      .status(401)
-      .send({ error: constants.errorMessages.PLEASE_AUTHENTICATE });
+    res.status(401).send({ error: errorMessages.PLEASE_AUTHENTICATE });
   }
 };
 
-module.exports = auth;
+export default auth;

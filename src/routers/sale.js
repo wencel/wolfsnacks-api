@@ -1,8 +1,8 @@
-const express = require('express');
-const auth = require('../middlewares/auth');
-const utils = require('../utils');
-const Sale = require('../models/sale');
-const constants = require('../constants');
+import express from 'express';
+import auth from '../middlewares/auth.js';
+import { checkValidUpdates } from '../utils.js';
+import Sale from '../models/sale.js';
+import { errorMessages } from '../constants.js';
 
 const saleRouter = express.Router();
 
@@ -42,20 +42,18 @@ saleRouter.get('/', auth, async (req, res) => {
     }
     const limit = req.query.limit ? parseInt(req.query.limit) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip) : 0;
-    await req.user
-      .populate({
-        path: 'sales',
-        populate: {
-          path: 'customer',
-        },
-        match,
-        options: {
-          limit,
-          skip,
-          sort,
-        },
-      })
-      .execPopulate();
+    await req.user.populate({
+      path: 'sales',
+      populate: {
+        path: 'customer',
+      },
+      match,
+      options: {
+        limit,
+        skip,
+        sort,
+      },
+    });
     const total = await Sale.countDocuments({ user: req.user._id });
     res.send({ data: req.user.sales, limit, skip, total });
   } catch (error) {
@@ -72,7 +70,7 @@ saleRouter.get('/:id', auth, async (req, res) => {
       path: 'customer',
     });
     if (!sale) {
-      res.status(404).send({ error: constants.errorMessages.SALE_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.SALE_NOT_FOUND });
     }
     res.send(sale);
   } catch (error) {
@@ -93,7 +91,7 @@ saleRouter.patch('/:id', auth, async (req, res) => {
     'products',
     'saleDate',
   ];
-  const failedUpdates = utils.checkValidUpdates(updates, allowedUpdates);
+  const failedUpdates = checkValidUpdates(updates, allowedUpdates);
   if (failedUpdates.length > 0) {
     return res.status(400).send({
       error: `Invalid fields to update ${failedUpdates.toString()}`,
@@ -105,7 +103,7 @@ saleRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!sale) {
-      res.status(404).send({ error: constants.errorMessages.SALE_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.SALE_NOT_FOUND });
     }
     updates.forEach(u => {
       sale[u] = req.body[u];
@@ -121,15 +119,14 @@ saleRouter.patch('/:id', auth, async (req, res) => {
 // Delete sale
 saleRouter.delete('/:id', auth, async (req, res) => {
   try {
-    const sale = await Sale.findOne({
+    const sale = await Sale.findOneAndDelete({
       _id: req.params.id,
       user: req.user._id,
     });
     if (!sale) {
-      res.status(404).send({ error: constants.errorMessages.SALE_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.SALE_NOT_FOUND });
       return;
     }
-    await sale.remove();
     res.send(sale);
   } catch (error) {
     error.reason
@@ -138,4 +135,4 @@ saleRouter.delete('/:id', auth, async (req, res) => {
   }
 });
 
-module.exports = saleRouter;
+export default saleRouter;

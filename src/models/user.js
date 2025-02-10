@@ -1,13 +1,15 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const Product = require('./product');
-const Customer = require('./customer');
-const Sale = require('./sale');
-const Order = require('./order');
-const { errorMessages } = require('../constants');
-const passwordValidator = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[\]:;<>,.?\/~_+\-=|]).{8,32}$/;
+import mongoose from 'mongoose';
+import validator from 'validator';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import Product from './product.js';
+import Customer from './customer.js';
+import Sale from './sale.js';
+import Order from './order.js';
+import { errorMessages } from '../constants.js';
+
+const passwordValidator =
+  /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[\]:;<>,.?\/~_+\-=|]).{8,32}$/;
 
 const userSchema = mongoose.Schema(
   {
@@ -134,6 +136,7 @@ userSchema.methods.generateAuthToken = async function (
   await user.save();
   return token;
 };
+
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
   if (!user) {
@@ -148,4 +151,4 @@ userSchema.statics.findByCredentials = async (email, password) => {
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+export default User;

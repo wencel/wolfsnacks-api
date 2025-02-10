@@ -1,13 +1,12 @@
-const express = require('express');
-const cors = require('cors');
-const userRouter = require('./routers/user');
-const productRouter = require('./routers/product');
-const customerRouter = require('./routers/customer');
-const orderRouter = require('./routers/order');
-const saleRouter = require('./routers/sale');
-const utilsRouter = require('./routers/utils');
-
-require('./db/mongoose');
+import express from 'express';
+import cors from 'cors';
+import userRouter from './routers/user.js';
+import productRouter from './routers/product.js';
+import customerRouter from './routers/customer.js';
+import orderRouter from './routers/order.js';
+import saleRouter from './routers/sale.js';
+import utilsRouter from './routers/utils.js';
+import './db/mongoose.js';
 
 const app = express();
 
@@ -42,4 +41,4 @@ app.use('/api/orders', orderRouter);
 app.use('/api/sales', saleRouter);
 app.use('/api/utils', utilsRouter);
 
-module.exports = app;
+export default app;

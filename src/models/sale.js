@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
-const Product = require('./product');
-const alternateProductSchema = require('./alternateProductSchema');
-const { errorMessages } = require('../constants');
+import mongoose from 'mongoose';
+import autoIncrement from 'mongoose-id-autoincrement';
+import Product from './product.js';
+import alternateProductSchema from './alternateProductSchema.js';
+import { errorMessages } from '../constants.js';
 
 const saleSchema = mongoose.Schema(
   {
@@ -141,4 +141,4 @@ saleSchema.plugin(autoIncrement.plugin, {
 
 const Sale = mongoose.model('Sale', saleSchema);
 
-module.exports = Sale;
+export default Sale;

@@ -1,13 +1,7 @@
-const request = require('supertest');
-const app = require('../src/app');
-const User = require('../src/models/user');
-const {
-  setupDB,
-  userOne,
-  userThree,
-  userTwo,
-  clearDB,
-} = require('./fixtures/db');
+import request from 'supertest';
+import app from '../src/app';
+import User from '../src/models/user';
+import { setupDB, userOne, userThree, userTwo, clearDB } from './fixtures/db';
 
 beforeEach(setupDB);
 afterEach(clearDB);

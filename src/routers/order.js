@@ -1,8 +1,8 @@
-const express = require('express');
-const auth = require('../middlewares/auth');
-const utils = require('../utils');
-const Order = require('../models/order');
-const constants = require('../constants');
+import express from 'express';
+import auth from '../middlewares/auth.js';
+import { checkValidUpdates } from '../utils.js';
+import Order from '../models/order.js';
+import { errorMessages } from '../constants.js';
 
 const orderRouter = express.Router();
 
@@ -34,17 +34,15 @@ orderRouter.get('/', auth, async (req, res) => {
     }
     const limit = req.query.limit ? parseInt(req.query.limit) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip) : 0;
-    await req.user
-      .populate({
-        path: 'orders',
-        match,
-        options: {
-          limit,
-          skip,
-          sort,
-        },
-      })
-      .execPopulate();
+    await req.user.populate({
+      path: 'orders',
+      match,
+      options: {
+        limit,
+        skip,
+        sort,
+      },
+    });
     const total = await Order.countDocuments({
       user: req.user._id,
       ...match,
@@ -62,7 +60,7 @@ orderRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!order) {
-      res.status(404).send({ error: constants.errorMessages.ORDER_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.ORDER_NOT_FOUND });
     }
     res.send(order);
   } catch (error) {
@@ -75,7 +73,7 @@ orderRouter.get('/:id', auth, async (req, res) => {
 orderRouter.patch('/:id', auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ['totalPrice', 'products', 'orderDate'];
-  const failedUpdates = utils.checkValidUpdates(updates, allowedUpdates);
+  const failedUpdates = checkValidUpdates(updates, allowedUpdates);
   if (failedUpdates.length > 0) {
     return res.status(400).send({
       error: `Invalid fields to update ${failedUpdates.toString()}`,
@@ -87,7 +85,7 @@ orderRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!order) {
-      res.status(404).send({ error: constants.errorMessages.ORDER_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.ORDER_NOT_FOUND });
     }
     updates.forEach(u => {
       order[u] = req.body[u];
@@ -103,15 +101,14 @@ orderRouter.patch('/:id', auth, async (req, res) => {
 // Delete order
 orderRouter.delete('/:id', auth, async (req, res) => {
   try {
-    const order = await Order.findOne({
+    const order = await Order.findOneAnDelete({
       _id: req.params.id,
       user: req.user._id,
     });
     if (!order) {
-      res.status(404).send({ error: constants.errorMessages.ORDER_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.ORDER_NOT_FOUND });
       return;
     }
-    await order.remove();
     res.send(order);
   } catch (error) {
     error.reason
@@ -120,4 +117,4 @@ orderRouter.delete('/:id', auth, async (req, res) => {
   }
 });
 
-module.exports = orderRouter;
+export default orderRouter;

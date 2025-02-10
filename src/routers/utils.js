@@ -1,8 +1,7 @@
-const fs = require('fs');
-const express = require('express');
-const { localities, presentations, productTypes } = require('../constants');
-const auth = require('../middlewares/auth');
-const Customer = require('../models/customer');
+import express from 'express';
+import { localities, presentations, productTypes } from '../constants.js';
+import auth from '../middlewares/auth.js';
+import Customer from '../models/customer.js';
 
 const utilsRouter = express.Router();
 
@@ -58,4 +57,4 @@ utilsRouter.post('/uploadCustomers', auth, async (req, res) => {
   res.status(200).send(`Se guardaron ${number} nuevos clientes`);
 });
 
-module.exports = utilsRouter;
+export default utilsRouter;

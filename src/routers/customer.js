@@ -1,8 +1,8 @@
-const express = require('express');
-const auth = require('../middlewares/auth');
-const utils = require('../utils');
-const Customer = require('../models/customer');
-const constants = require('../constants');
+import express from 'express';
+import auth from '../middlewares/auth.js';
+import { checkValidUpdates } from '../utils.js';
+import Customer from '../models/customer.js';
+import { errorMessages } from '../constants.js';
 
 const customerRouter = express.Router();
 
@@ -41,17 +41,15 @@ customerRouter.get('/', auth, async (req, res) => {
     }
     const limit = req.query.limit ? parseInt(req.query.limit) : 10;
     const skip = req.query.skip ? parseInt(req.query.skip) : 0;
-    await req.user
-      .populate({
-        path: 'customers',
-        match,
-        options: {
-          limit,
-          skip,
-          sort,
-        },
-      })
-      .execPopulate();
+    await req.user.populate({
+      path: 'customers',
+      match,
+      options: {
+        limit,
+        skip,
+        sort,
+      },
+    });
     const total = await Customer.countDocuments({
       user: req.user._id,
       ...match,
@@ -69,9 +67,7 @@ customerRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!customer) {
-      res
-        .status(404)
-        .send({ error: constants.errorMessages.CUSTOMER_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.CUSTOMER_NOT_FOUND });
     }
     res.send(customer);
   } catch (error) {
@@ -94,7 +90,7 @@ customerRouter.patch('/:id', auth, async (req, res) => {
     'town',
     'idNumber',
   ];
-  const failedUpdates = utils.checkValidUpdates(updates, allowedUpdates);
+  const failedUpdates = checkValidUpdates(updates, allowedUpdates);
   if (failedUpdates.length > 0) {
     return res.status(400).send({
       error: `Invalid fields to update ${failedUpdates.toString()}`,
@@ -106,9 +102,7 @@ customerRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!customer) {
-      res
-        .status(404)
-        .send({ error: constants.errorMessages.CUSTOMER_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.CUSTOMER_NOT_FOUND });
     }
     updates.forEach(u => {
       customer[u] = req.body[u];
@@ -129,9 +123,7 @@ customerRouter.delete('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!customer) {
-      res
-        .status(404)
-        .send({ error: constants.errorMessages.CUSTOMER_NOT_FOUND });
+      res.status(404).send({ error: errorMessages.CUSTOMER_NOT_FOUND });
       return;
     }
     res.send(customer);
@@ -142,4 +134,4 @@ customerRouter.delete('/:id', auth, async (req, res) => {
   }
 });
 
-module.exports = customerRouter;
+export default customerRouter;

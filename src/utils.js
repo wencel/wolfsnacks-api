@@ -1,4 +1,4 @@
-const checkValidUpdates = (updates, allowedUpdates) => {
+export const checkValidUpdates = (updates, allowedUpdates) => {
   const failedUpdates = [];
   updates.forEach(update => {
     const validUpdate = allowedUpdates.includes(update);
@@ -8,5 +8,3 @@ const checkValidUpdates = (updates, allowedUpdates) => {
   });
   return failedUpdates;
 };
-
-module.exports = { checkValidUpdates };

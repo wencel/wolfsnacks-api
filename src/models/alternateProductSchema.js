@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { errorMessages } = require('../constants');
+import mongoose from 'mongoose';
+import { errorMessages } from '../constants.js';
 // Schema to use in the order and sales schemas
 const alternateProductSchema = mongoose.Schema({
   product: {
@@ -36,4 +36,4 @@ const alternateProductSchema = mongoose.Schema({
   },
 });
 
-module.exports = alternateProductSchema;
+export default alternateProductSchema;

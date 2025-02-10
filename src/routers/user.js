@@ -1,10 +1,10 @@
-const express = require('express');
-const User = require('../models/user');
-const { checkValidUpdates } = require('../utils');
-const auth = require('../middlewares/auth');
-const multer = require('multer');
-const sharp = require('sharp');
-const { sendWelcomeEmail, sendCancelationEmail } = require('../emails/account');
+import express from 'express';
+import { checkValidUpdates } from '../utils.js';
+import multer from 'multer';
+import User from '../models/user.js';
+import sharp from 'sharp';
+import auth from '../middlewares/auth.js';
+import { sendWelcomeEmail, sendCancelationEmail } from '../emails/account.js';
 
 const userRouter = express.Router();
 
@@ -24,7 +24,7 @@ userRouter.post('/', async (req, res) => {
 userRouter.get('/me', auth, async (req, res) => {
   // The populate, fills the tasks array from a foreign key
   // To add to the resposne please check the toJSON defined in the user model
-  await req.user.populate('tasks').execPopulate();
+  await req.user.populate('tasks');
   res.send(req.user);
 });
 // Update user
@@ -52,7 +52,9 @@ userRouter.patch('/me', auth, async (req, res) => {
 // Delete user
 userRouter.delete('/me', auth, async (req, res) => {
   try {
-    await req.user.remove();
+    const user = await User.findOneAndDelete({
+      _id: req.user._id,
+    });
     sendCancelationEmail(req.user.email, req.user.name);
     res.send(req.user);
   } catch (error) {
@@ -166,4 +168,4 @@ userRouter.get('/:id/avatar', async (req, res) => {
   }
 });
 
-module.exports = userRouter;
+export default userRouter;
