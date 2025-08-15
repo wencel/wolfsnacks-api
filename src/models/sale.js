@@ -69,7 +69,7 @@ saleSchema.pre('save', async function (next) {
       const product = this.products[i];
       const item = await Product.findById(product.product);
       if (!item) {
-        throw new Error('El producto no existe');
+        throw new Error(errorMessages.PRODUCT_NOT_FOUND);
       }
       let quantityToRemove = product.quantity;
       /* if there are previous products then this is an existing sale and the quantity

@@ -20,7 +20,7 @@ const productSchema = mongoose.Schema(
       required: true,
       validate(value) {
         if (value <= 0) {
-          throw new Error('El peso debe ser mayor a 0');
+          throw new Error(errorMessages.WEIGHT_INFERIOR_LIMIT);
         }
       },
     },

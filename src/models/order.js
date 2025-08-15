@@ -47,7 +47,7 @@ orderSchema.pre('save', async function (next) {
       const product = this.products[i];
       const item = await Product.findById(product.product);
       if (!item) {
-        throw new Error('El producto no existe');
+        throw new Error(errorMessages.PRODUCT_NOT_FOUND);
       }
       let quantityToAdd = product.quantity;
       /* if there are previous products then this is an existing order and the quantity

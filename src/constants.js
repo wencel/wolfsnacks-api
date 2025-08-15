@@ -33,6 +33,11 @@ export const presentations = [
 export const productTypes = ['', 'Maxigalleta', 'Minigalleta', 'Chips'];
 
 export const errorMessages = {
+  USER_NOT_ACTIVE: 'El usuario no esta activo',
+  INVALID_ACTIVATION_TOKEN: 'Token inválido',
+  INVALID_IMAGE_FORMAT: 'Por favor suba una imagen válida',
+  USER_AVATAR_NOT_FOUND: 'Avatar del usuario no encontrado',
+  WEIGHT_INFERIOR_LIMIT: 'El peso debe ser mayor a 0',
   PRICE_INFERIOR_LIMIT: 'El valor del precio debe ser mayor a 0',
   PRICE_INFERIOR_LIMIT_2: 'El valor del precio debe ser mayor o igual a 0',
   QUANTITY_INFERIOR_LIMIT: 'La cantidad debe ser mayor a 0',

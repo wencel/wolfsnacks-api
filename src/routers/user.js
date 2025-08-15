@@ -22,9 +22,6 @@ userRouter.post('/', async (req, res) => {
 });
 // Read current user
 userRouter.get('/me', auth, async (req, res) => {
-  // The populate, fills the tasks array from a foreign key
-  // To add to the resposne please check the toJSON defined in the user model
-  await req.user.populate('tasks');
   res.send(req.user);
 });
 // Update user
@@ -69,12 +66,12 @@ userRouter.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findByCredentials(email, password);
     if (!user.active) {
-      throw new Error('El usuario no esta activo');
+      throw new Error(errorMessages.USER_NOT_ACTIVE);
     }
     const token = await user.generateAuthToken(false);
     res.send({ user, token });
   } catch (error) {
-    res.status(400).send({ error: error.toString() });
+    res.status(400).send({ message: error.message });
   }
 });
 // Logout user
@@ -105,7 +102,7 @@ userRouter.get('/activate/:activationToken', async (req, res) => {
     const { activationToken } = req.params;
     const user = await User.findOne({ activationToken });
     if (!user) {
-      throw new Error('Token inválido');
+      throw new Error(errorMessages.INVALID_ACTIVATION_TOKEN);
     }
     user.activationToken = '';
     user.active = true;
@@ -122,7 +119,7 @@ const upload = multer({
   },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      cb(new Error('Please upload a valid image'));
+      cb(new Error(errorMessages.INVALID_IMAGE_FORMAT));
     }
     cb(undefined, true);
   },
@@ -159,7 +156,7 @@ userRouter.get('/:id/avatar', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user || !user.avatar) {
-      throw new Error('User avatar not found');
+      throw new Error(errorMessages.USER_AVATAR_NOT_FOUND);
     }
     res.set('Content-Type', 'image/png');
     res.send(user.avatar);
