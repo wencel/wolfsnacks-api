@@ -44,9 +44,14 @@ saleRouter.get('/', auth, async (req, res) => {
     const skip = req.query.skip ? parseInt(req.query.skip) : 0;
     await req.user.populate({
       path: 'sales',
-      populate: {
-        path: 'customer',
-      },
+      populate: [
+        {
+          path: 'customer',
+        },
+        {
+          path: 'products.product',
+        },
+      ],
       match,
       options: {
         limit,

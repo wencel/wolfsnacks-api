@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import autoIncrement from 'mongoose-id-autoincrement';
+import AutoIncrement from 'mongoose-sequence';
 import Product from './product.js';
 import alternateProductSchema from './alternateProductSchema.js';
 import { errorMessages } from '../constants.js';
@@ -108,13 +108,7 @@ orderSchema.pre('remove', async function (next) {
   next();
 });
 
-autoIncrement.initialize(mongoose.connection);
-
-orderSchema.plugin(autoIncrement.plugin, {
-  model: 'Order',
-  field: 'orderId',
-  startAt: 1,
-});
+orderSchema.plugin(AutoIncrement(mongoose), { inc_field: 'orderId', start_seq: 1 });
 
 const Order = mongoose.model('Order', orderSchema);
 

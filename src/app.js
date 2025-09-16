@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import './db/mongoose.js';
 import userRouter from './routers/user.js';
 import productRouter from './routers/product.js';
 import customerRouter from './routers/customer.js';
 import orderRouter from './routers/order.js';
 import saleRouter from './routers/sale.js';
 import utilsRouter from './routers/utils.js';
-import './db/mongoose.js';
 
 const app = express();
 
