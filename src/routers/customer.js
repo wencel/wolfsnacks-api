@@ -67,7 +67,7 @@ customerRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!customer) {
-      res.status(404).send({ error: errorMessages.CUSTOMER_NOT_FOUND });
+      return res.status(404).send({ error: errorMessages.CUSTOMER_NOT_FOUND });
     }
     res.send(customer);
   } catch (error) {
@@ -102,7 +102,7 @@ customerRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!customer) {
-      res.status(404).send({ error: errorMessages.CUSTOMER_NOT_FOUND });
+      return res.status(404).send({ error: errorMessages.CUSTOMER_NOT_FOUND });
     }
     updates.forEach(u => {
       customer[u] = req.body[u];

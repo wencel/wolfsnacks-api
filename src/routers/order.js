@@ -60,7 +60,7 @@ orderRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!order) {
-      res.status(404).send({ error: errorMessages.ORDER_NOT_FOUND });
+      return res.status(404).send({ error: errorMessages.ORDER_NOT_FOUND });
     }
     res.send(order);
   } catch (error) {
@@ -85,7 +85,7 @@ orderRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!order) {
-      res.status(404).send({ error: errorMessages.ORDER_NOT_FOUND });
+      return res.status(404).send({ error: errorMessages.ORDER_NOT_FOUND });
     }
     updates.forEach(u => {
       order[u] = req.body[u];

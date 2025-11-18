@@ -69,7 +69,7 @@ productRouter.get('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!product) {
-      res.status(404).send({ error: errorMessages.PRODUCT_NOT_FOUND });
+      return res.status(404).send({ error: errorMessages.PRODUCT_NOT_FOUND });
     }
     res.send(product);
   } catch (error) {
@@ -94,7 +94,7 @@ productRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!product) {
-      res.status(404).send({ error: errorMessages.PRODUCT_NOT_FOUND });
+      return res.status(404).send({ error: errorMessages.PRODUCT_NOT_FOUND });
     }
     updates.forEach(u => {
       product[u] = req.body[u];

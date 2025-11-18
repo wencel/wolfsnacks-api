@@ -71,11 +71,16 @@ saleRouter.get('/:id', auth, async (req, res) => {
     const sale = await Sale.findOne({
       _id: req.params.id,
       user: req.user._id,
-    }).populate({
-      path: 'customer',
-    });
+    }).populate([
+      {
+        path: 'customer',
+      },
+      {
+        path: 'products.product',
+      },
+    ]);
     if (!sale) {
-      res.status(404).send({ error: errorMessages.SALE_NOT_FOUND });
+      return res.status(404).send({ error: errorMessages.SALE_NOT_FOUND });
     }
     res.send(sale);
   } catch (error) {
@@ -108,7 +113,7 @@ saleRouter.patch('/:id', auth, async (req, res) => {
       user: req.user._id,
     });
     if (!sale) {
-      res.status(404).send({ error: errorMessages.SALE_NOT_FOUND });
+      return res.status(404).send({ error: errorMessages.SALE_NOT_FOUND });
     }
     updates.forEach(u => {
       sale[u] = req.body[u];
