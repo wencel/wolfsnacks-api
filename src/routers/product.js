@@ -55,7 +55,10 @@ productRouter.get('/', auth, async (req, res) => {
         sort,
       },
     });
-    const total = await Product.countDocuments({ user: req.user._id });
+    const total = await Product.countDocuments({
+      user: req.user._id,
+      ...match,
+    });
     res.send({ data: req.user.products, limit, skip, total });
   } catch (error) {
     res.status(500).send({ error: error.toString() });

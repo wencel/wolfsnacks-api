@@ -59,7 +59,10 @@ saleRouter.get('/', auth, async (req, res) => {
         sort,
       },
     });
-    const total = await Sale.countDocuments({ user: req.user._id });
+    const total = await Sale.countDocuments({
+      user: req.user._id,
+      ...match,
+    });
     res.send({ data: req.user.sales, limit, skip, total });
   } catch (error) {
     res.status(500).send({ error: error.toString() });

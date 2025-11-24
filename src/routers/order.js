@@ -101,7 +101,7 @@ orderRouter.patch('/:id', auth, async (req, res) => {
 // Delete order
 orderRouter.delete('/:id', auth, async (req, res) => {
   try {
-    const order = await Order.findOneAnDelete({
+    const order = await Order.findOneAndDelete({
       _id: req.params.id,
       user: req.user._id,
     });
