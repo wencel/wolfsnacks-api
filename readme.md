@@ -164,7 +164,44 @@ The API will be available at `http://localhost:3001`
 
 ### Production Deployment
 
-For production deployment (e.g., Heroku):
+#### Render Deployment
+
+This project is configured for deployment on [Render](https://render.com). The `Procfile` and `render.yaml` are already set up.
+
+**Steps to deploy on Render:**
+
+1. **Create a new Web Service** on Render and connect your GitHub repository
+
+2. **Configure Environment Variables** in Render dashboard:
+   - `MONGODB_URL` - Your MongoDB connection string (e.g., MongoDB Atlas)
+   - `JWT_SECRET` - A strong secret key for JWT token signing
+   - `MAILTRAP_TOKEN` - Your Mailtrap API token (or your production email service token)
+   - `WEB_URL` - Your frontend application URL (e.g., `https://your-frontend.onrender.com`)
+   - `ALLOWED_ORIGINS` - Comma-separated list of additional allowed origins (optional, defaults include localhost and Heroku URLs)
+
+3. **Build & Deploy Settings:**
+   - Build Command: `npm install` (auto-detected)
+   - Start Command: `npm start` (auto-detected from Procfile)
+   - Node Version: 22.x (specified in package.json)
+
+4. **MongoDB Setup:**
+   - Use MongoDB Atlas or Render's MongoDB service
+   - Ensure your MongoDB instance allows connections from Render's IP addresses
+
+**Example Environment Variables:**
+```env
+MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/wolfsnacks-prod
+JWT_SECRET=your-super-secret-production-jwt-key
+MAILTRAP_TOKEN=your-mailtrap-token
+WEB_URL=https://your-frontend-app.onrender.com
+ALLOWED_ORIGINS=https://your-frontend-app.onrender.com,https://another-domain.com
+```
+
+**Note:** Render automatically sets the `PORT` environment variable, so you don't need to configure it.
+
+#### Heroku Deployment
+
+For Heroku deployment:
 
 ```bash
 npm start
