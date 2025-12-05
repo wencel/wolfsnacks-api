@@ -190,7 +190,7 @@ This project is configured for deployment on [Render](https://render.com). The `
 
 **Example Environment Variables:**
 ```env
-MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/wolfsnacks-prod
+MONGODB_URL=mongodb+srv://username:password@your-mongo-db-url
 JWT_SECRET=your-super-secret-production-jwt-key
 MAILTRAP_TOKEN=your-mailtrap-token
 WEB_URL=https://your-frontend-app.onrender.com
