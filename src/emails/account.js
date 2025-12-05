@@ -1,43 +1,41 @@
-import { MailtrapClient } from 'mailtrap';
+import nodemailer from "nodemailer";
 
-const mailTrapClient = new MailtrapClient({
-  token: process.env.MAILTRAP_TOKEN,
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,       // your gmail (e.g. you@gmail.com)
+    pass: process.env.GMAIL_APP_PASS,   // your 16-char app password
+  },
 });
-export const sendWelcomeEmail = (email, name, token) => {
-  const sender = {
-    name: 'Wolf App Team',
-    email: 'wencelfabiansantos@gmail.com',
-  };
 
-  mailTrapClient
-    .send({
-      from: sender,
-      to: [{ email }],
-      subject: 'Activa tu cuenta',
-      text: `Hola ${name}, por favor activa tu cuenta haciendo click en ${process.env.WEB_URL}/api/users/activate/${token}`,
-      html: `<strong>Hola ${name}, por favor activa tu cuenta haciendo click
-       <a href="${process.env.WEB_URL}/api/users/activate/${token}" target="_blank" rel="noopener noreferrer">aca</a> </strong>`,
-    })
-    .then(console.log)
-    .catch(console.error);
+export const sendWelcomeEmail = async (to, name, token) => {
+  const mailOptions = {
+    from: `Wolf App Team <${process.env.GMAIL_USER}>`,
+    to,
+    subject: "Activa tu cuenta de Wolfsnacks",
+    html: `<strong>Hola ${name}, por favor activa tu cuenta haciendo click
+       <a href="${process.env.WEB_URL}/activate/${token}" target="_blank" rel="noopener noreferrer">aca</a> </strong>`,
+  };
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Activation email sent");
+  } catch (err) {
+    console.error("Email error:", err);
+  }
 };
 
-export const sendCancelationEmail = (email, name) => {
-  const sender = {
-    name: 'Wolf App Team',
-    email: 'wencelfabiansantos@gmail.com',
+export const sendCancelationEmail = async (to, name) => {
+  const mailOptions = {
+    from: `Wolf App Team <${process.env.GMAIL_USER}>`,
+    to,
+    subject: "Cancelación de cuenta de Wolfsnacks",
+    html: `<strong>Hola ${name}, nos alegra que nos hayas dado la oportunidad de ser parte de tu negocio.
+       Si tienes alguna pregunta, no dudes en contactarnos.`
   };
-
-  mailTrapClient
-    .send({
-      from: sender,
-      to: [{ email }],
-      subject: 'Sorry to see you go',
-      text: `Hi ${name}, we are sorry to see you go, please let us know
-     if there is anything we could have done to make you stay`,
-      html: `<strong>Hi ${name}, we are sorry to see you go, please let us know
-    if there is anything we could have done to make you stay</strong>`,
-    })
-    .then(console.log)
-    .catch(console.error);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Cancelation email sent");
+  } catch (err) {
+    console.error("Email error:", err);
+  }
 };

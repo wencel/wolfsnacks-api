@@ -5,6 +5,7 @@ import User from '../models/user.js';
 import sharp from 'sharp';
 import auth from '../middlewares/auth.js';
 import { sendWelcomeEmail, sendCancelationEmail } from '../emails/account.js';
+import { errorMessages } from '../constants.js';
 
 const userRouter = express.Router();
 
@@ -17,7 +18,13 @@ userRouter.post('/', async (req, res) => {
     sendWelcomeEmail(user.email, user.name, token);
     res.status(201).send({ user, token });
   } catch (error) {
-    res.status(400).send({ error });
+    let errorMessage = error.message;
+    if (error.name === 'ValidationError') {
+      errorMessage = error.message;
+    } else if (error.code === 11000) {
+      errorMessage = 'El correo electrónico ya está en uso';
+    }
+    res.status(400).send({ error: errorMessage });
   }
 });
 // Read current user
@@ -97,7 +104,7 @@ userRouter.post('/logoutAll', auth, async (req, res) => {
   }
 });
 // Activate user
-userRouter.get('/activate/:activationToken', async (req, res) => {
+userRouter.post('/activate/:activationToken', async (req, res) => {
   try {
     const { activationToken } = req.params;
     const user = await User.findOne({ activationToken });

@@ -20,7 +20,7 @@ This is the backend API of a full-stack solution. The frontend application is av
 * **Authentication**: JWT-based authentication with secure password hashing
 * **Data Validation**: Comprehensive input validation and error handling
 * **Image Processing**: User avatar upload and processing with Sharp
-* **Email Integration**: Account activation emails via Mailtrap
+* **Email Integration**: Account activation emails via Gmail
 
 ### Technical Highlights
 
@@ -54,7 +54,7 @@ This is the backend API of a full-stack solution. The frontend application is av
 * **Validator** - Input validation
 * **Multer** - File upload handling
 * **Sharp** - Image processing
-* **Mailtrap** - Email service for development
+* **Nodemailer** - Email service with Gmail integration
 * **Mongoose Sequence** - Auto-incrementing sequences
 
 ### Development Tools
@@ -139,12 +139,20 @@ MONGODB_URL=mongodb://localhost:27017/wolfsnacks-dev
 # JWT Authentication
 JWT_SECRET=your-super-secret-jwt-key-here
 
-# Email Service (Mailtrap)
-MAILTRAP_TOKEN=your-mailtrap-token-here
+# Email Service (Gmail)
+GMAIL_USER=your-gmail-address@gmail.com
+GMAIL_APP_PASS=your-16-character-app-password
 
 # Web Application URL
 WEB_URL=http://localhost:5173
 ```
+
+**Note:** To generate a Gmail app password:
+1. Go to your Google Account settings
+2. Enable 2-Step Verification if not already enabled
+3. Go to Security → 2-Step Verification → App passwords
+4. Generate a new app password for "Mail" and "Other (Custom name)"
+5. Use the generated 16-character password for `GMAIL_APP_PASS`
 
 4. Start MongoDB:
 
@@ -175,7 +183,8 @@ This project is configured for deployment on [Render](https://render.com). The `
 2. **Configure Environment Variables** in Render dashboard:
    - `MONGODB_URL` - Your MongoDB connection string (e.g., MongoDB Atlas)
    - `JWT_SECRET` - A strong secret key for JWT token signing
-   - `MAILTRAP_TOKEN` - Your Mailtrap API token (or your production email service token)
+   - `GMAIL_USER` - Your Gmail address (e.g., `you@gmail.com`)
+   - `GMAIL_APP_PASS` - Your Gmail 16-character app password (generate from Google Account settings)
    - `WEB_URL` - Your frontend application URL (e.g., `https://your-frontend.onrender.com`)
    - `ALLOWED_ORIGINS` - Comma-separated list of additional allowed origins (optional, defaults include localhost and Heroku URLs)
 
@@ -192,7 +201,8 @@ This project is configured for deployment on [Render](https://render.com). The `
 ```env
 MONGODB_URL=mongodb+srv://username:password@your-mongo-db-url
 JWT_SECRET=your-super-secret-production-jwt-key
-MAILTRAP_TOKEN=your-mailtrap-token
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASS=your-16-character-app-password
 WEB_URL=https://your-frontend-app.onrender.com
 ALLOWED_ORIGINS=https://your-frontend-app.onrender.com,https://another-domain.com
 ```
@@ -406,6 +416,7 @@ See `package.json` for the complete list. Notable dependencies:
 * **multer** - File uploads
 * **sharp** - Image processing
 * **validator** - Input validation
+* **nodemailer** - Email sending with Gmail
 
 ## 🤝 Contributing
 
