@@ -3,6 +3,7 @@ import auth from '../middlewares/auth.js';
 import { checkValidUpdates } from '../utils.js';
 import Customer from '../models/customer.js';
 import { errorMessages } from '../constants.js';
+import logger from '../utils/logger.js';
 
 const customerRouter = express.Router();
 
@@ -13,6 +14,7 @@ customerRouter.post('/', auth, async (req, res) => {
     await customer.save();
     res.status(201).send(customer);
   } catch (error) {
+    logger.error({ error, entity: 'customer', operation: 'create', userId: req.user._id }, 'Error creating customer');
     res.status(400).send({ error });
   }
 });
@@ -56,6 +58,7 @@ customerRouter.get('/', auth, async (req, res) => {
     });
     res.send({ data: req.user.customers, limit, skip, total });
   } catch (error) {
+    logger.error({ error, entity: 'customer', operation: 'list', userId: req.user._id }, 'Error listing customers');
     res.status(500).send({ error: error.toString() });
   }
 });
@@ -71,6 +74,7 @@ customerRouter.get('/:id', auth, async (req, res) => {
     }
     res.send(customer);
   } catch (error) {
+    logger.error({ error, entity: 'customer', operation: 'read', userId: req.user._id, customerId: req.params.id }, 'Error getting customer');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -110,6 +114,7 @@ customerRouter.patch('/:id', auth, async (req, res) => {
     await customer.save();
     res.send(customer);
   } catch (error) {
+    logger.error({ error, entity: 'customer', operation: 'update', userId: req.user._id, customerId: req.params.id }, 'Error updating customer');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -128,6 +133,7 @@ customerRouter.delete('/:id', auth, async (req, res) => {
     }
     res.send(customer);
   } catch (error) {
+    logger.error({ error, entity: 'customer', operation: 'delete', userId: req.user._id, customerId: req.params.id }, 'Error deleting customer');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });

@@ -56,6 +56,8 @@ This is the backend API of a full-stack solution. The frontend application is av
 * **Sharp** - Image processing
 * **Nodemailer** - Email service with Gmail integration
 * **Mongoose Sequence** - Auto-incrementing sequences
+* **Pino** - High-performance JSON logger
+* **pino-http** - HTTP request logging middleware
 
 ### Development Tools
 
@@ -63,7 +65,6 @@ This is the backend API of a full-stack solution. The frontend application is av
 * **Jest** - Testing framework
 * **Supertest** - HTTP assertion testing
 * **env-cmd** - Environment variable management
-* **Chalk** - Terminal string styling
 
 ## 📁 Project Structure
 
@@ -91,6 +92,8 @@ src/
 │   └── utils.js        # Utility routes
 ├── middlewares/
 │   └── auth.js         # JWT authentication middleware
+├── utils/
+│   └── logger.js       # Pino logger configuration
 └── emails/
     └── account.js      # Email templates and sending
 
@@ -187,6 +190,7 @@ This project is configured for deployment on [Render](https://render.com). The `
    - `GMAIL_APP_PASS` - Your Gmail 16-character app password (generate from Google Account settings)
    - `WEB_URL` - Your frontend application URL (e.g., `https://your-frontend.onrender.com`)
    - `ALLOWED_ORIGINS` - Comma-separated list of additional allowed origins (optional, defaults include localhost and Heroku URLs)
+   - `LOG_LEVEL` - Logging verbosity level: `debug`, `info`, `warn`, or `error` (optional, defaults to `info` in production)
 
 3. **Build & Deploy Settings:**
    - Build Command: `npm install` (auto-detected)
@@ -205,6 +209,7 @@ GMAIL_USER=your-email@gmail.com
 GMAIL_APP_PASS=your-16-character-app-password
 WEB_URL=https://your-frontend-app.onrender.com
 ALLOWED_ORIGINS=https://your-frontend-app.onrender.com,https://another-domain.com
+LOG_LEVEL=info
 ```
 
 **Note:** Render automatically sets the `PORT` environment variable, so you don't need to configure it.
@@ -384,6 +389,49 @@ Tests use Jest and Supertest for API endpoint testing.
 * **Validation Errors**: Detailed validation error messages
 * **Error Constants**: Centralized error messages in `constants.js`
 
+### Logging
+
+The API uses [Pino](https://getpino.io/) for structured logging, providing high-performance JSON logging optimized for production environments.
+
+**Features:**
+* **Structured Logging**: All logs are in JSON format for easy parsing and filtering
+* **Request Logging**: Automatic HTTP request/response logging via `pino-http` middleware
+* **Error Logging**: Comprehensive error logging across all entities (users, products, customers, orders, sales)
+* **Environment-Aware**: Pretty-printed logs in development, JSON logs in production
+
+**Log Format:**
+All error logs include:
+* `entity` - The entity type (user, product, customer, order, sale)
+* `operation` - The operation being performed (create, read, update, delete, list, etc.)
+* `userId` - The user ID when available
+* `error` - The error object with full stack trace
+
+**Configuration:**
+* **Development**: Logs are pretty-printed with colors for readability
+* **Production**: Logs are in JSON format for log aggregation systems (Render)
+* **Log Level**: Controlled by `LOG_LEVEL` environment variable (default: `info` in production, `debug` in development)
+
+**Example Log Entry:**
+```json
+{
+  "level": 50,
+  "time": 1234567890123,
+  "entity": "product",
+  "operation": "create",
+  "userId": "507f1f77bcf86cd799439011",
+  "error": {
+    "message": "Validation failed",
+    "stack": "..."
+  },
+  "msg": "Error creating product"
+}
+```
+
+**Viewing Logs:**
+* **Development**: Logs appear in the console with pretty formatting
+* **Production (Render)**: View logs in the Render dashboard under your service's "Logs" tab
+* **Log Levels**: Set `LOG_LEVEL` environment variable to `debug`, `info`, `warn`, or `error` to control verbosity
+
 ## 🔒 Security Considerations
 
 * All passwords are hashed using bcrypt before storage
@@ -417,6 +465,8 @@ See `package.json` for the complete list. Notable dependencies:
 * **sharp** - Image processing
 * **validator** - Input validation
 * **nodemailer** - Email sending with Gmail
+* **pino** - High-performance JSON logger
+* **pino-http** - HTTP request logging middleware
 
 ## 🤝 Contributing
 

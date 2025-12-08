@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import auth from '../middlewares/auth.js';
 import { sendWelcomeEmail, sendCancelationEmail } from '../emails/account.js';
 import { errorMessages } from '../constants.js';
+import logger from '../utils/logger.js';
 
 const userRouter = express.Router();
 
@@ -18,6 +19,7 @@ userRouter.post('/', async (req, res) => {
     sendWelcomeEmail(user.email, user.name, token);
     res.status(201).send({ user, token });
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'create' }, 'Error creating user');
     let errorMessage = error.message;
     if (error.name === 'ValidationError') {
       errorMessage = error.message;
@@ -48,6 +50,7 @@ userRouter.patch('/me', auth, async (req, res) => {
     await req.user.save();
     res.send(req.user);
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'update', userId: req.user._id }, 'Error updating user');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -62,6 +65,7 @@ userRouter.delete('/me', auth, async (req, res) => {
     sendCancelationEmail(req.user.email, req.user.name);
     res.send(req.user);
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'delete', userId: req.user._id }, 'Error deleting user');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -78,6 +82,7 @@ userRouter.post('/login', async (req, res) => {
     const token = await user.generateAuthToken(false);
     res.send({ user, token });
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'login', email: req.body.email }, 'Error logging in user');
     res.status(400).send({ message: error.message });
   }
 });
@@ -90,6 +95,7 @@ userRouter.post('/logout', auth, async (req, res) => {
     await req.user.save();
     res.send();
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'logout', userId: req.user._id }, 'Error logging out user');
     res.status(500).send({ error: error.toString() });
   }
 });
@@ -100,6 +106,7 @@ userRouter.post('/logoutAll', auth, async (req, res) => {
     await req.user.save();
     res.send();
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'logoutAll', userId: req.user._id }, 'Error logging out all sessions');
     res.status(500).send({ error: error.toString() });
   }
 });
@@ -116,6 +123,7 @@ userRouter.post('/activate/:activationToken', async (req, res) => {
     const token = await user.generateAuthToken(false);
     res.send({ user, token });
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'activate' }, 'Error activating user');
     res.status(400).send({ error: error.toString() });
   }
 });
@@ -145,6 +153,7 @@ userRouter.post(
     res.send({ message: 'File uploaded successfully' });
   },
   (error, req, res, next) => {
+    logger.error({ error, entity: 'user', operation: 'uploadAvatar', userId: req.user?._id }, 'Error uploading avatar');
     res.status(400).send({ error: error.message });
   }
 );
@@ -155,6 +164,7 @@ userRouter.delete('/me/avatar', auth, async (req, res) => {
     await req.user.save();
     res.send({ message: 'Avatar removed' });
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'deleteAvatar', userId: req.user._id }, 'Error deleting avatar');
     res.status(400).send({ error: error.toString() });
   }
 });
@@ -168,6 +178,7 @@ userRouter.get('/:id/avatar', async (req, res) => {
     res.set('Content-Type', 'image/png');
     res.send(user.avatar);
   } catch (error) {
+    logger.error({ error, entity: 'user', operation: 'getAvatar', userId: req.params.id }, 'Error getting avatar');
     res.status(400).send({ error: error.toString() });
   }
 });

@@ -2,6 +2,7 @@ import express from 'express';
 import { localities, presentations, productTypes } from '../constants.js';
 import auth from '../middlewares/auth.js';
 import Customer from '../models/customer.js';
+import logger from '../utils/logger.js';
 
 const utilsRouter = express.Router();
 
@@ -51,7 +52,7 @@ utilsRouter.post('/uploadCustomers', auth, async (req, res) => {
       await customer.save();
       number++;
     } catch (e) {
-      console.log(e);
+      logger.error({ error: e, index, userId: req.user._id }, 'Error saving customer');
     }
   }
   res.status(200).send(`Se guardaron ${number} nuevos clientes`);

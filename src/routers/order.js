@@ -3,6 +3,7 @@ import auth from '../middlewares/auth.js';
 import { checkValidUpdates } from '../utils.js';
 import Order from '../models/order.js';
 import { errorMessages } from '../constants.js';
+import logger from '../utils/logger.js';
 
 const orderRouter = express.Router();
 
@@ -13,7 +14,7 @@ orderRouter.post('/', auth, async (req, res) => {
     await order.save();
     res.status(201).send(order);
   } catch (error) {
-    console.log(error);
+    logger.error({ error, entity: 'order', operation: 'create', userId: req.user._id }, 'Error creating order');
     res.status(400).send({ error: error.toString() });
   }
 });
@@ -49,6 +50,7 @@ orderRouter.get('/', auth, async (req, res) => {
     });
     res.send({ data: req.user.orders, limit, skip, total });
   } catch (error) {
+    logger.error({ error, entity: 'order', operation: 'list', userId: req.user._id }, 'Error listing orders');
     res.status(500).send({ error: error.toString() });
   }
 });
@@ -64,6 +66,7 @@ orderRouter.get('/:id', auth, async (req, res) => {
     }
     res.send(order);
   } catch (error) {
+    logger.error({ error, entity: 'order', operation: 'read', userId: req.user._id, orderId: req.params.id }, 'Error getting order');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -93,6 +96,7 @@ orderRouter.patch('/:id', auth, async (req, res) => {
     await order.save();
     res.send(order);
   } catch (error) {
+    logger.error({ error, entity: 'order', operation: 'update', userId: req.user._id, orderId: req.params.id }, 'Error updating order');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -111,6 +115,7 @@ orderRouter.delete('/:id', auth, async (req, res) => {
     }
     res.send(order);
   } catch (error) {
+    logger.error({ error, entity: 'order', operation: 'delete', userId: req.user._id, orderId: req.params.id }, 'Error deleting order');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });

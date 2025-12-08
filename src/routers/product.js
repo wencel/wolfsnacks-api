@@ -3,6 +3,7 @@ import auth from '../middlewares/auth.js';
 import { checkValidUpdates } from '../utils.js';
 import Product from '../models/product.js';
 import { errorMessages } from '../constants.js';
+import logger from '../utils/logger.js';
 
 const productRouter = express.Router();
 
@@ -13,6 +14,7 @@ productRouter.post('/', auth, async (req, res) => {
     await product.save();
     res.status(201).send(product);
   } catch (error) {
+    logger.error({ error, entity: 'product', operation: 'create', userId: req.user._id }, 'Error creating product');
     res.status(400).send({ error: error.toString() });
   }
 });
@@ -61,6 +63,7 @@ productRouter.get('/', auth, async (req, res) => {
     });
     res.send({ data: req.user.products, limit, skip, total });
   } catch (error) {
+    logger.error({ error, entity: 'product', operation: 'list', userId: req.user._id }, 'Error listing products');
     res.status(500).send({ error: error.toString() });
   }
 });
@@ -76,6 +79,7 @@ productRouter.get('/:id', auth, async (req, res) => {
     }
     res.send(product);
   } catch (error) {
+    logger.error({ error, entity: 'product', operation: 'read', userId: req.user._id, productId: req.params.id }, 'Error getting product');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -105,6 +109,7 @@ productRouter.patch('/:id', auth, async (req, res) => {
     await product.save();
     res.send(product);
   } catch (error) {
+    logger.error({ error, entity: 'product', operation: 'update', userId: req.user._id, productId: req.params.id }, 'Error updating product');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -123,6 +128,7 @@ productRouter.delete('/:id', auth, async (req, res) => {
     }
     res.send(product);
   } catch (error) {
+    logger.error({ error, entity: 'product', operation: 'delete', userId: req.user._id, productId: req.params.id }, 'Error deleting product');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });

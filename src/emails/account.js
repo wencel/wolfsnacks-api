@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import logger from "../utils/logger.js";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -18,9 +19,9 @@ export const sendWelcomeEmail = async (to, name, token) => {
   };
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Activation email sent");
+    logger.info({ to, name }, "Activation email sent");
   } catch (err) {
-    console.error("Email error:", err);
+    logger.error({ err, to, name }, "Email error");
   }
 };
 
@@ -34,8 +35,8 @@ export const sendCancelationEmail = async (to, name) => {
   };
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Cancelation email sent");
+    logger.info({ to, name }, "Cancelation email sent");
   } catch (err) {
-    console.error("Email error:", err);
+    logger.error({ err, to, name }, "Email error");
   }
 };

@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import pinoHttp from 'pino-http';
+import logger from './utils/logger.js';
 import './db/mongoose.js';
 import userRouter from './routers/user.js';
 import productRouter from './routers/product.js';
@@ -9,6 +11,21 @@ import saleRouter from './routers/sale.js';
 import utilsRouter from './routers/utils.js';
 
 const app = express();
+
+// Add pino-http middleware for request logging
+app.use(
+  pinoHttp({
+    logger,
+    customLogLevel: function (req, res, err) {
+      if (res.statusCode >= 400 && res.statusCode < 500) {
+        return 'warn';
+      } else if (res.statusCode >= 500 || err) {
+        return 'error';
+      }
+      return 'info';
+    },
+  })
+);
 
 const defaultOrigins = [
   'http://localhost:5173',

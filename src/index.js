@@ -1,8 +1,8 @@
-import chalk from 'chalk';
 import app from './app.js';
+import logger from './utils/logger.js';
 
 const port = process.env.PORT || 3001;
 
 app.listen(port, () => {
-  console.log(chalk.bgGreen(`App running in port ${port}`));
+  logger.info({ port }, 'App running');
 });

@@ -3,6 +3,7 @@ import auth from '../middlewares/auth.js';
 import { checkValidUpdates } from '../utils.js';
 import Sale from '../models/sale.js';
 import { errorMessages } from '../constants.js';
+import logger from '../utils/logger.js';
 
 const saleRouter = express.Router();
 
@@ -13,6 +14,7 @@ saleRouter.post('/', auth, async (req, res) => {
     await sale.save();
     res.status(201).send(sale);
   } catch (error) {
+    logger.error({ error, entity: 'sale', operation: 'create', userId: req.user._id }, 'Error creating sale');
     res.status(400).send({ error: error.message });
   }
 });
@@ -65,6 +67,7 @@ saleRouter.get('/', auth, async (req, res) => {
     });
     res.send({ data: req.user.sales, limit, skip, total });
   } catch (error) {
+    logger.error({ error, entity: 'sale', operation: 'list', userId: req.user._id }, 'Error listing sales');
     res.status(500).send({ error: error.toString() });
   }
 });
@@ -87,6 +90,7 @@ saleRouter.get('/:id', auth, async (req, res) => {
     }
     res.send(sale);
   } catch (error) {
+    logger.error({ error, entity: 'sale', operation: 'read', userId: req.user._id, saleId: req.params.id }, 'Error getting sale');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -124,6 +128,7 @@ saleRouter.patch('/:id', auth, async (req, res) => {
     await sale.save();
     res.send(sale);
   } catch (error) {
+    logger.error({ error, entity: 'sale', operation: 'update', userId: req.user._id, saleId: req.params.id }, 'Error updating sale');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -142,6 +147,7 @@ saleRouter.delete('/:id', auth, async (req, res) => {
     }
     res.send(sale);
   } catch (error) {
+    logger.error({ error, entity: 'sale', operation: 'delete', userId: req.user._id, saleId: req.params.id }, 'Error deleting sale');
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
