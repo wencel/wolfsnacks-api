@@ -8,3 +8,8 @@ export const checkValidUpdates = (updates, allowedUpdates) => {
   });
   return failedUpdates;
 };
+
+export const toTitleCase = (str) => {
+  if (!str) return str;
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}

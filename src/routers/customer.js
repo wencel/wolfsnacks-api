@@ -50,6 +50,7 @@ customerRouter.get('/', auth, async (req, res) => {
         limit,
         skip,
         sort,
+        collation: { locale: 'en', strength: 2 },
       },
     });
     const total = await Customer.countDocuments({
