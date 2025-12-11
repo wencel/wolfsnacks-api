@@ -16,7 +16,9 @@ userRouter.post('/', async (req, res) => {
   try {
     await user.save();
     const token = await user.generateAuthToken(true);
-    sendWelcomeEmail(user.email, user.name, token);
+    sendWelcomeEmail(user.email, user.name, token).catch((err) => {
+      logger.error({ err, entity: 'user', operation: 'sendWelcomeEmail', userId: user._id }, 'Error sending welcome email');
+    });
     res.status(201).send({ user, token });
   } catch (error) {
     logger.error({ error, entity: 'user', operation: 'create' }, 'Error creating user');
@@ -62,7 +64,9 @@ userRouter.delete('/me', auth, async (req, res) => {
     const user = await User.findOneAndDelete({
       _id: req.user._id,
     });
-    sendCancelationEmail(req.user.email, req.user.name);
+    sendCancelationEmail(req.user.email, req.user.name).catch((err) => {
+      logger.error({ err, entity: 'user', operation: 'sendCancelationEmail', userId: req.user._id }, 'Error sending cancelation email');
+    });
     res.send(req.user);
   } catch (error) {
     logger.error({ error, entity: 'user', operation: 'delete', userId: req.user._id }, 'Error deleting user');
