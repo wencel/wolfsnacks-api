@@ -8,6 +8,8 @@ This API serves as the backend infrastructure for a comprehensive business manag
 
 This is the backend API of a full-stack solution. The frontend application is available at [wolfsnack-vite](https://github.com/wencel/wolfsnack-vite).
 
+**Live API**: [https://wolfsnacks-api.onrender.com](https://wolfsnacks-api.onrender.com)
+
 ## ✨ Features
 
 ### Core Functionality
@@ -487,5 +489,6 @@ Built as a showcase of Node.js and Express proficiency, and as a practical busin
 ## 🔗 Related Repositories
 
 * **Frontend Application**: [wolfsnack-vite](https://github.com/wencel/wolfsnack-vite)
+* **Live API**: https://wolfsnacks-api.onrender.com](https://wolfsnacks-api.onrender.com)
 
 **Note**: This API is designed to work with the frontend application. Ensure both are running and properly configured for full functionality.
