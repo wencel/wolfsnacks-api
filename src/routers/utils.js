@@ -111,7 +111,7 @@ utilsRouter.post(
           // Validate that customer name doesn't already exist for this user
           if (customerToSend.name) {
             const existingCustomer = await Customer.findOne({
-              name: customerToSend.name,
+              storeName: customerToSend.storeName,
               user: req.user._id,
             });
             if (existingCustomer) {
