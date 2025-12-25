@@ -24,7 +24,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mailtrap": "^3.4.0",
+    "mailtrap": "^4.1.0",
     "mongodb": "^6.13.0",
     "mongoose": "^8.10.1",
     "mongoose-sequence": "^6.0.1",
