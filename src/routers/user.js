@@ -5,7 +5,7 @@ import User from '../models/user.js';
 import sharp from 'sharp';
 import auth from '../middlewares/auth.js';
 import { sendWelcomeEmail, sendCancelationEmail } from '../emails/account.js';
-import { errorMessages } from '../constants.js';
+import { COOKIE_NAME, cookieOptions, errorMessages } from '../constants.js';
 import logger from '../utils/logger.js';
 
 const userRouter = express.Router();
@@ -17,9 +17,12 @@ userRouter.post('/', async (req, res) => {
     await user.save();
     const token = await user.generateAuthToken(true);
     sendWelcomeEmail(user.email, user.name, token).catch((err) => {
-      logger.error({ err, entity: 'user', operation: 'sendWelcomeEmail', userId: user._id }, 'Error sending welcome email');
+      logger.error(
+        { err, entity: 'user', operation: 'sendWelcomeEmail', userId: user._id },
+        'Error sending welcome email'
+      );
     });
-    res.status(201).send({ user, token });
+    res.status(201).send({ user });
   } catch (error) {
     logger.error({ error, entity: 'user', operation: 'create' }, 'Error creating user');
     let errorMessage = error.message;
@@ -46,13 +49,16 @@ userRouter.patch('/me', auth, async (req, res) => {
     });
   }
   try {
-    updates.forEach(u => {
+    updates.forEach((u) => {
       req.user[u] = req.body[u];
     });
     await req.user.save();
     res.send(req.user);
   } catch (error) {
-    logger.error({ error, entity: 'user', operation: 'update', userId: req.user._id }, 'Error updating user');
+    logger.error(
+      { error, entity: 'user', operation: 'update', userId: req.user._id },
+      'Error updating user'
+    );
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -65,11 +71,17 @@ userRouter.delete('/me', auth, async (req, res) => {
       _id: req.user._id,
     });
     sendCancelationEmail(req.user.email, req.user.name).catch((err) => {
-      logger.error({ err, entity: 'user', operation: 'sendCancelationEmail', userId: req.user._id }, 'Error sending cancelation email');
+      logger.error(
+        { err, entity: 'user', operation: 'sendCancelationEmail', userId: req.user._id },
+        'Error sending cancelation email'
+      );
     });
     res.send(req.user);
   } catch (error) {
-    logger.error({ error, entity: 'user', operation: 'delete', userId: req.user._id }, 'Error deleting user');
+    logger.error(
+      { error, entity: 'user', operation: 'delete', userId: req.user._id },
+      'Error deleting user'
+    );
     error.reason
       ? res.status(400).send({ error: error.reason.toString() })
       : res.status(500).send({ error: error.toString() });
@@ -78,28 +90,30 @@ userRouter.delete('/me', auth, async (req, res) => {
 // Login user
 userRouter.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
     const user = await User.findByCredentials(email, password);
     if (!user.active) {
       throw new Error(errorMessages.USER_NOT_ACTIVE);
     }
     const token = await user.generateAuthToken(false);
-    res.send({ user, token });
+    res.cookie(COOKIE_NAME, token, cookieOptions(rememberMe)).send({ user });
   } catch (error) {
-    logger.error({ error, entity: 'user', operation: 'login', email: req.body.email }, 'Error logging in user');
+    const { email } = req.body;
+    logger.error({ error, entity: 'user', operation: 'login', email }, 'Error logging in user');
     res.status(400).send({ message: error.message });
   }
 });
 // Logout user
 userRouter.post('/logout', auth, async (req, res) => {
   try {
-    req.user.tokens = req.user.tokens.filter(
-      token => req.token !== token.token
-    );
+    req.user.tokens = req.user.tokens.filter((token) => req.token !== token.token);
     await req.user.save();
-    res.send();
+    res.clearCookie(COOKIE_NAME).send();
   } catch (error) {
-    logger.error({ error, entity: 'user', operation: 'logout', userId: req.user._id }, 'Error logging out user');
+    logger.error(
+      { error, entity: 'user', operation: 'logout', userId: req.user._id },
+      'Error logging out user'
+    );
     res.status(500).send({ error: error.toString() });
   }
 });
@@ -108,9 +122,12 @@ userRouter.post('/logoutAll', auth, async (req, res) => {
   try {
     req.user.tokens = [];
     await req.user.save();
-    res.send();
+    res.clearCookie(COOKIE_NAME).send();
   } catch (error) {
-    logger.error({ error, entity: 'user', operation: 'logoutAll', userId: req.user._id }, 'Error logging out all sessions');
+    logger.error(
+      { error, entity: 'user', operation: 'logoutAll', userId: req.user._id },
+      'Error logging out all sessions'
+    );
     res.status(500).send({ error: error.toString() });
   }
 });
@@ -125,7 +142,7 @@ userRouter.post('/activate/:activationToken', async (req, res) => {
     user.activationToken = '';
     user.active = true;
     const token = await user.generateAuthToken(false);
-    res.send({ user, token });
+    res.cookie(COOKIE_NAME, token, cookieOptions()).send({ user });
   } catch (error) {
     logger.error({ error, entity: 'user', operation: 'activate' }, 'Error activating user');
     res.status(400).send({ error: error.toString() });
@@ -157,7 +174,10 @@ userRouter.post(
     res.send({ message: 'File uploaded successfully' });
   },
   (error, req, res, next) => {
-    logger.error({ error, entity: 'user', operation: 'uploadAvatar', userId: req.user?._id }, 'Error uploading avatar');
+    logger.error(
+      { error, entity: 'user', operation: 'uploadAvatar', userId: req.user?._id },
+      'Error uploading avatar'
+    );
     res.status(400).send({ error: error.message });
   }
 );
@@ -168,7 +188,10 @@ userRouter.delete('/me/avatar', auth, async (req, res) => {
     await req.user.save();
     res.send({ message: 'Avatar removed' });
   } catch (error) {
-    logger.error({ error, entity: 'user', operation: 'deleteAvatar', userId: req.user._id }, 'Error deleting avatar');
+    logger.error(
+      { error, entity: 'user', operation: 'deleteAvatar', userId: req.user._id },
+      'Error deleting avatar'
+    );
     res.status(400).send({ error: error.toString() });
   }
 });
@@ -182,7 +205,10 @@ userRouter.get('/:id/avatar', async (req, res) => {
     res.set('Content-Type', 'image/png');
     res.send(user.avatar);
   } catch (error) {
-    logger.error({ error, entity: 'user', operation: 'getAvatar', userId: req.params.id }, 'Error getting avatar');
+    logger.error(
+      { error, entity: 'user', operation: 'getAvatar', userId: req.params.id },
+      'Error getting avatar'
+    );
     res.status(400).send({ error: error.toString() });
   }
 });

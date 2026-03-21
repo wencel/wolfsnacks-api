@@ -9,8 +9,11 @@ import customerRouter from './routers/customer.js';
 import orderRouter from './routers/order.js';
 import saleRouter from './routers/sale.js';
 import utilsRouter from './routers/utils.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
+
+app.use(cookieParser());
 
 // Add pino-http middleware for request logging
 app.use(
@@ -40,6 +43,7 @@ const allowedOrigins = [...defaultOrigins, ...additionalOrigins];
 
 app.use(
   cors({
+    credentials: true,
     origin: function (origin, callback) {
       // allow requests with no origin
       // (like mobile apps or curl requests)

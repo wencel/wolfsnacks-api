@@ -58,3 +58,15 @@ export const errorMessages = {
   PRODUCT_DUPLICATE_ERROR:
     'Los campos Nombre, Presentación y Peso deben ser una combinacion única. Ya existe un producto como el que estas tratando de crear.',
 };
+
+export const cookieOptions = (rememberMe = true) => {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: rememberMe ? 1000 * 60 * 60 * 24 * 30 : undefined, // 7 days
+    path: '/',
+  };
+};
+
+export const COOKIE_NAME = 'token';

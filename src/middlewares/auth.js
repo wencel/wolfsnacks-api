@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
-import { errorMessages } from '../constants.js';
+import { errorMessages, COOKIE_NAME } from '../constants.js';
 import User from '../models/user.js';
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('Authorization').replace('Bearer ', '');
+    const token = req.cookies[COOKIE_NAME];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({
       _id: decoded._id,

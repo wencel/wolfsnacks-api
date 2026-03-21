@@ -46,10 +46,4 @@ const clearDB = async () => {
   await User.deleteMany();
 };
 
-export default {
-  userOne,
-  userTwo,
-  userThree,
-  setupDB,
-  clearDB,
-};
+export { userOne, userTwo, userThree, setupDB, clearDB };

@@ -1,7 +1,10 @@
 import request from 'supertest';
 import app from '../src/app';
 import User from '../src/models/user';
+import { COOKIE_NAME } from '../src/constants';
 import { setupDB, userOne, userThree, userTwo, clearDB } from './fixtures/db';
+
+const authCookie = (token) => `${COOKIE_NAME}=${token}`;
 
 beforeEach(setupDB);
 afterEach(clearDB);
@@ -18,14 +21,13 @@ test('Should create a new user', async () => {
   // Assert user create din DB
   const user = await User.findById(response.body.user._id);
   expect(user).toBeTruthy();
-  // Assert Expected object
+  expect(user.activationToken).toBeTruthy();
   expect(response.body).toMatchObject({
     user: {
       active: false,
       name: 'Wencel Santos',
       email: 'wencelsantos@gmail.com',
     },
-    token: user.activationToken,
   });
 });
 
@@ -86,10 +88,10 @@ test('Should login existing user', async () => {
       password: userOne.password,
     })
     .expect(200);
+  expect(response.headers['set-cookie']).toBeDefined();
+  expect(response.headers['set-cookie'][0]).toMatch(new RegExp(`^${COOKIE_NAME}=`));
   const user = await User.findById(userOne._id);
-  // Assert Expected object
-
-  expect(user.tokens[0]).toMatchObject({ token: response.body.token });
+  expect(user.tokens).toHaveLength(1);
 });
 
 test('Should not login non existing user', async () => {
@@ -139,7 +141,7 @@ test('Should not login inactive user', async () => {
 test('Should logout user', async () => {
   await request(app)
     .post('/api/users/logout')
-    .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+    .set('Cookie', authCookie(userTwo.tokens[0].token))
     .send()
     .expect(200);
   const user = await User.findById(userTwo._id);
@@ -149,7 +151,7 @@ test('Should logout user', async () => {
 test('Should not logout unauthenticated user', async () => {
   await request(app)
     .post('/api/users/logout')
-    .set('Authorization', `Bearer`)
+    .set('Cookie', `${COOKIE_NAME}=invalid`)
     .send()
     .expect(401);
   await request(app).post('/api/users/logout').send().expect(401);
@@ -158,7 +160,7 @@ test('Should not logout unauthenticated user', async () => {
 test('Should logout all sessions for user', async () => {
   await request(app)
     .post('/api/users/logoutAll')
-    .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+    .set('Cookie', authCookie(userTwo.tokens[0].token))
     .send()
     .expect(200);
   const user = await User.findById(userTwo._id);
@@ -168,7 +170,7 @@ test('Should logout all sessions for user', async () => {
 test('Should upload avatar image', async () => {
   await request(app)
     .post('/api/users/me/avatar')
-    .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+    .set('Cookie', authCookie(userTwo.tokens[0].token))
     .attach('avatar', 'tests/fixtures/profile-pic.jpg')
     .expect(200);
   const user = await User.findById(userTwo._id);
@@ -178,7 +180,7 @@ test('Should upload avatar image', async () => {
 test('Should not upload avatar image to unauthenticated user', async () => {
   await request(app)
     .post('/api/users/me/avatar')
-    .set('Authorization', `Bearer`)
+    .set('Cookie', `${COOKIE_NAME}=invalid`)
     .attach('avatar', 'tests/fixtures/profile-pic.jpg')
     .expect(401);
   await request(app)
@@ -194,7 +196,7 @@ test('Should update valid fields for user', async () => {
   };
   const response = await request(app)
     .patch('/api/users/me')
-    .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+    .set('Cookie', authCookie(userTwo.tokens[0].token))
     .send(newData)
     .expect(200);
   // Assert valid respone
@@ -204,7 +206,7 @@ test('Should update valid fields for user', async () => {
   // logout user to login with new password
   await request(app)
     .post('/api/users/logoutAll')
-    .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+    .set('Cookie', authCookie(userTwo.tokens[0].token))
     .send()
     .expect(200);
   const response2 = await request(app)
@@ -215,7 +217,7 @@ test('Should update valid fields for user', async () => {
     })
     .expect(200);
   const user = await User.findById(userTwo._id);
-  expect(user.tokens[0]).toMatchObject({ token: response2.body.token });
+  expect(user.tokens).toHaveLength(1);
 });
 
 test('Should not update invalid fields for user', async () => {
@@ -224,7 +226,7 @@ test('Should not update invalid fields for user', async () => {
   };
   await request(app)
     .patch('/api/users/me')
-    .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+    .set('Cookie', authCookie(userTwo.tokens[0].token))
     .send(newData)
     .expect(400);
 });
@@ -235,7 +237,7 @@ test('Should not update unauthenticated user', async () => {
   };
   await request(app)
     .patch('/api/users/me')
-    .set('Authorization', `Bearer `)
+    .set('Cookie', `${COOKIE_NAME}=invalid`)
     .send(newData)
     .expect(401);
   await request(app).patch('/api/users/me').send(newData).expect(401);
